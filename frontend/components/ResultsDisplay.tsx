@@ -92,6 +92,71 @@ export default function ResultsDisplay({ results, videoId, onReset }: ResultsDis
           </div>
         </div>
 
+        {/* Enhanced Quality Assessment */}
+        {results.quality_assessment && (
+          <div className="mb-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <h3 className="font-semibold text-blue-900 mb-3 flex items-center space-x-2">
+              <Target className="w-5 h-5" />
+              <span>Video Quality Assessment</span>
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-sm text-blue-700">Overall Quality</span>
+                  <span className="text-sm font-medium">{(results.quality_assessment.overall_score * 100).toFixed(0)}%</span>
+                </div>
+                <div className="w-full bg-blue-200 rounded-full h-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${results.quality_assessment.overall_score * 100}%` }}
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-blue-700">Brightness:</span>
+                  <span>{results.quality_assessment.brightness.toFixed(0)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-blue-700">Contrast:</span>
+                  <span>{results.quality_assessment.contrast.toFixed(0)}</span>
+                </div>
+              </div>
+            </div>
+
+            {results.quality_assessment.needs_review && (
+              <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-3">
+                <p className="text-yellow-800 font-medium mb-2">⚠️ Quality Issues Detected:</p>
+                <ul className="text-sm text-yellow-700 space-y-1">
+                  {results.quality_assessment.issues.map((issue, index) => (
+                    <li key={index}>• {issue}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Detection Method Summary */}
+        {results.detection_summary && (
+          <div className="mb-8 p-4 bg-green-50 rounded-lg border border-green-200">
+            <h3 className="font-semibold text-green-900 mb-3">Detection Methods Used</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {Object.entries(results.detection_summary.methods).map(([method, count]) => (
+                <div key={method} className="text-center">
+                  <div className="text-2xl font-bold text-green-700">{count}</div>
+                  <div className="text-xs text-green-600 capitalize">{method.replace('_', ' ')}</div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 text-sm text-green-700">
+              Success Rate: {(results.detection_summary.success_rate * 100).toFixed(1)}%
+            </div>
+          </div>
+        )}
+
         {results.debug_frames && results.debug_frames.length > 0 && (
           <div className="border-t pt-6">
             <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2">
