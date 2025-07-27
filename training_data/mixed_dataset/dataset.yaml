@@ -1,0 +1,6 @@
+names:
+- soccer_ball
+nc: 1
+path: /Users/andreworozco/soccer app/training_data/mixed_dataset
+train: images/train
+val: images/val

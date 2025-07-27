@@ -13,6 +13,8 @@ from pathlib import Path
 from typing import List, Dict, Optional, Set
 from dataclasses import dataclass, asdict
 from datetime import datetime, timedelta
+import concurrent.futures
+import threading
 
 import yt_dlp
 from youtubesearchpython import VideosSearch
@@ -20,6 +22,11 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 import psutil
+
+# Add training status tracking
+import sys
+sys.path.append(str(Path(__file__).parent.parent / "automation"))
+from training_status import update_collection_status, Status
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

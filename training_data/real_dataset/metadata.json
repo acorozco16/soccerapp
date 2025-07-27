@@ -1,0 +1,575 @@
+{
+  "source_video": "uploads/raw/20250726_075501_a984b9ba.mp4",
+  "total_samples": 55,
+  "positive_samples": 25,
+  "negative_samples": 30,
+  "touch_events": [
+    {
+      "timestamp": 0.25,
+      "frame": 15,
+      "confidence": 0.5,
+      "position": [
+        687,
+        141
+      ],
+      "detection_method": "hough_2"
+    },
+    {
+      "timestamp": 1.15,
+      "frame": 69,
+      "confidence": 0.5,
+      "position": [
+        712,
+        70
+      ],
+      "detection_method": "contour"
+    },
+    {
+      "timestamp": 2.35,
+      "frame": 141,
+      "confidence": 0.5,
+      "position": [
+        859,
+        201
+      ],
+      "detection_method": "hough_2"
+    },
+    {
+      "timestamp": 4.2,
+      "frame": 252,
+      "confidence": 0.5,
+      "position": [
+        814,
+        288
+      ],
+      "detection_method": "hough_1"
+    },
+    {
+      "timestamp": 5.55,
+      "frame": 333,
+      "confidence": 0.5,
+      "position": [
+        887,
+        303
+      ],
+      "detection_method": "hough_2"
+    }
+  ],
+  "samples": [
+    {
+      "image": "training_data/real_dataset/images/real_touch_1_frame_000010_offset_-05.jpg",
+      "label": null,
+      "touch_id": 1,
+      "frame_offset": -5,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_1_frame_000011_offset_-04.jpg",
+      "label": null,
+      "touch_id": 1,
+      "frame_offset": -4,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_1_frame_000012_offset_-03.jpg",
+      "label": null,
+      "touch_id": 1,
+      "frame_offset": -3,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_1_frame_000013_offset_-02.jpg",
+      "label": "training_data/real_dataset/labels/real_touch_1_frame_000013_offset_-02.txt",
+      "touch_id": 1,
+      "frame_offset": -2,
+      "ball_position": [
+        668,
+        131
+      ],
+      "confidence": 0.5
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_1_frame_000014_offset_-01.jpg",
+      "label": "training_data/real_dataset/labels/real_touch_1_frame_000014_offset_-01.txt",
+      "touch_id": 1,
+      "frame_offset": -1,
+      "ball_position": [
+        688,
+        143
+      ],
+      "confidence": 0.5
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_1_frame_000015_offset_+00.jpg",
+      "label": "training_data/real_dataset/labels/real_touch_1_frame_000015_offset_+00.txt",
+      "touch_id": 1,
+      "frame_offset": 0,
+      "ball_position": [
+        687,
+        141
+      ],
+      "confidence": 0.5
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_1_frame_000016_offset_+01.jpg",
+      "label": "training_data/real_dataset/labels/real_touch_1_frame_000016_offset_+01.txt",
+      "touch_id": 1,
+      "frame_offset": 1,
+      "ball_position": [
+        685,
+        127
+      ],
+      "confidence": 0.5
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_1_frame_000017_offset_+02.jpg",
+      "label": "training_data/real_dataset/labels/real_touch_1_frame_000017_offset_+02.txt",
+      "touch_id": 1,
+      "frame_offset": 2,
+      "ball_position": [
+        706,
+        129
+      ],
+      "confidence": 0.5
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_1_frame_000018_offset_+03.jpg",
+      "label": null,
+      "touch_id": 1,
+      "frame_offset": 3,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_1_frame_000019_offset_+04.jpg",
+      "label": null,
+      "touch_id": 1,
+      "frame_offset": 4,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_1_frame_000020_offset_+05.jpg",
+      "label": null,
+      "touch_id": 1,
+      "frame_offset": 5,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_2_frame_000064_offset_-05.jpg",
+      "label": null,
+      "touch_id": 2,
+      "frame_offset": -5,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_2_frame_000065_offset_-04.jpg",
+      "label": null,
+      "touch_id": 2,
+      "frame_offset": -4,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_2_frame_000066_offset_-03.jpg",
+      "label": null,
+      "touch_id": 2,
+      "frame_offset": -3,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_2_frame_000067_offset_-02.jpg",
+      "label": "training_data/real_dataset/labels/real_touch_2_frame_000067_offset_-02.txt",
+      "touch_id": 2,
+      "frame_offset": -2,
+      "ball_position": [
+        703,
+        58
+      ],
+      "confidence": 0.5
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_2_frame_000068_offset_-01.jpg",
+      "label": "training_data/real_dataset/labels/real_touch_2_frame_000068_offset_-01.txt",
+      "touch_id": 2,
+      "frame_offset": -1,
+      "ball_position": [
+        716,
+        55
+      ],
+      "confidence": 0.5
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_2_frame_000069_offset_+00.jpg",
+      "label": "training_data/real_dataset/labels/real_touch_2_frame_000069_offset_+00.txt",
+      "touch_id": 2,
+      "frame_offset": 0,
+      "ball_position": [
+        712,
+        70
+      ],
+      "confidence": 0.5
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_2_frame_000070_offset_+01.jpg",
+      "label": "training_data/real_dataset/labels/real_touch_2_frame_000070_offset_+01.txt",
+      "touch_id": 2,
+      "frame_offset": 1,
+      "ball_position": [
+        728,
+        74
+      ],
+      "confidence": 0.5
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_2_frame_000071_offset_+02.jpg",
+      "label": "training_data/real_dataset/labels/real_touch_2_frame_000071_offset_+02.txt",
+      "touch_id": 2,
+      "frame_offset": 2,
+      "ball_position": [
+        721,
+        85
+      ],
+      "confidence": 0.5
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_2_frame_000072_offset_+03.jpg",
+      "label": null,
+      "touch_id": 2,
+      "frame_offset": 3,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_2_frame_000073_offset_+04.jpg",
+      "label": null,
+      "touch_id": 2,
+      "frame_offset": 4,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_2_frame_000074_offset_+05.jpg",
+      "label": null,
+      "touch_id": 2,
+      "frame_offset": 5,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_3_frame_000136_offset_-05.jpg",
+      "label": null,
+      "touch_id": 3,
+      "frame_offset": -5,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_3_frame_000137_offset_-04.jpg",
+      "label": null,
+      "touch_id": 3,
+      "frame_offset": -4,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_3_frame_000138_offset_-03.jpg",
+      "label": null,
+      "touch_id": 3,
+      "frame_offset": -3,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_3_frame_000139_offset_-02.jpg",
+      "label": "training_data/real_dataset/labels/real_touch_3_frame_000139_offset_-02.txt",
+      "touch_id": 3,
+      "frame_offset": -2,
+      "ball_position": [
+        850,
+        221
+      ],
+      "confidence": 0.5
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_3_frame_000140_offset_-01.jpg",
+      "label": "training_data/real_dataset/labels/real_touch_3_frame_000140_offset_-01.txt",
+      "touch_id": 3,
+      "frame_offset": -1,
+      "ball_position": [
+        859,
+        215
+      ],
+      "confidence": 0.5
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_3_frame_000141_offset_+00.jpg",
+      "label": "training_data/real_dataset/labels/real_touch_3_frame_000141_offset_+00.txt",
+      "touch_id": 3,
+      "frame_offset": 0,
+      "ball_position": [
+        859,
+        201
+      ],
+      "confidence": 0.5
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_3_frame_000142_offset_+01.jpg",
+      "label": "training_data/real_dataset/labels/real_touch_3_frame_000142_offset_+01.txt",
+      "touch_id": 3,
+      "frame_offset": 1,
+      "ball_position": [
+        846,
+        205
+      ],
+      "confidence": 0.5
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_3_frame_000143_offset_+02.jpg",
+      "label": "training_data/real_dataset/labels/real_touch_3_frame_000143_offset_+02.txt",
+      "touch_id": 3,
+      "frame_offset": 2,
+      "ball_position": [
+        841,
+        220
+      ],
+      "confidence": 0.5
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_3_frame_000144_offset_+03.jpg",
+      "label": null,
+      "touch_id": 3,
+      "frame_offset": 3,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_3_frame_000145_offset_+04.jpg",
+      "label": null,
+      "touch_id": 3,
+      "frame_offset": 4,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_3_frame_000146_offset_+05.jpg",
+      "label": null,
+      "touch_id": 3,
+      "frame_offset": 5,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_4_frame_000247_offset_-05.jpg",
+      "label": null,
+      "touch_id": 4,
+      "frame_offset": -5,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_4_frame_000248_offset_-04.jpg",
+      "label": null,
+      "touch_id": 4,
+      "frame_offset": -4,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_4_frame_000249_offset_-03.jpg",
+      "label": null,
+      "touch_id": 4,
+      "frame_offset": -3,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_4_frame_000250_offset_-02.jpg",
+      "label": "training_data/real_dataset/labels/real_touch_4_frame_000250_offset_-02.txt",
+      "touch_id": 4,
+      "frame_offset": -2,
+      "ball_position": [
+        807,
+        290
+      ],
+      "confidence": 0.5
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_4_frame_000251_offset_-01.jpg",
+      "label": "training_data/real_dataset/labels/real_touch_4_frame_000251_offset_-01.txt",
+      "touch_id": 4,
+      "frame_offset": -1,
+      "ball_position": [
+        809,
+        278
+      ],
+      "confidence": 0.5
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_4_frame_000252_offset_+00.jpg",
+      "label": "training_data/real_dataset/labels/real_touch_4_frame_000252_offset_+00.txt",
+      "touch_id": 4,
+      "frame_offset": 0,
+      "ball_position": [
+        814,
+        288
+      ],
+      "confidence": 0.5
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_4_frame_000253_offset_+01.jpg",
+      "label": "training_data/real_dataset/labels/real_touch_4_frame_000253_offset_+01.txt",
+      "touch_id": 4,
+      "frame_offset": 1,
+      "ball_position": [
+        824,
+        281
+      ],
+      "confidence": 0.5
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_4_frame_000254_offset_+02.jpg",
+      "label": "training_data/real_dataset/labels/real_touch_4_frame_000254_offset_+02.txt",
+      "touch_id": 4,
+      "frame_offset": 2,
+      "ball_position": [
+        821,
+        304
+      ],
+      "confidence": 0.5
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_4_frame_000255_offset_+03.jpg",
+      "label": null,
+      "touch_id": 4,
+      "frame_offset": 3,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_4_frame_000256_offset_+04.jpg",
+      "label": null,
+      "touch_id": 4,
+      "frame_offset": 4,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_4_frame_000257_offset_+05.jpg",
+      "label": null,
+      "touch_id": 4,
+      "frame_offset": 5,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_5_frame_000328_offset_-05.jpg",
+      "label": null,
+      "touch_id": 5,
+      "frame_offset": -5,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_5_frame_000329_offset_-04.jpg",
+      "label": null,
+      "touch_id": 5,
+      "frame_offset": -4,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_5_frame_000330_offset_-03.jpg",
+      "label": null,
+      "touch_id": 5,
+      "frame_offset": -3,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_5_frame_000331_offset_-02.jpg",
+      "label": "training_data/real_dataset/labels/real_touch_5_frame_000331_offset_-02.txt",
+      "touch_id": 5,
+      "frame_offset": -2,
+      "ball_position": [
+        888,
+        310
+      ],
+      "confidence": 0.5
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_5_frame_000332_offset_-01.jpg",
+      "label": "training_data/real_dataset/labels/real_touch_5_frame_000332_offset_-01.txt",
+      "touch_id": 5,
+      "frame_offset": -1,
+      "ball_position": [
+        888,
+        303
+      ],
+      "confidence": 0.5
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_5_frame_000333_offset_+00.jpg",
+      "label": "training_data/real_dataset/labels/real_touch_5_frame_000333_offset_+00.txt",
+      "touch_id": 5,
+      "frame_offset": 0,
+      "ball_position": [
+        887,
+        303
+      ],
+      "confidence": 0.5
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_5_frame_000334_offset_+01.jpg",
+      "label": "training_data/real_dataset/labels/real_touch_5_frame_000334_offset_+01.txt",
+      "touch_id": 5,
+      "frame_offset": 1,
+      "ball_position": [
+        889,
+        287
+      ],
+      "confidence": 0.5
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_5_frame_000335_offset_+02.jpg",
+      "label": "training_data/real_dataset/labels/real_touch_5_frame_000335_offset_+02.txt",
+      "touch_id": 5,
+      "frame_offset": 2,
+      "ball_position": [
+        900,
+        298
+      ],
+      "confidence": 0.5
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_5_frame_000336_offset_+03.jpg",
+      "label": null,
+      "touch_id": 5,
+      "frame_offset": 3,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_5_frame_000337_offset_+04.jpg",
+      "label": null,
+      "touch_id": 5,
+      "frame_offset": 4,
+      "ball_position": null,
+      "confidence": 0.0
+    },
+    {
+      "image": "training_data/real_dataset/images/real_touch_5_frame_000338_offset_+05.jpg",
+      "label": null,
+      "touch_id": 5,
+      "frame_offset": 5,
+      "ball_position": null,
+      "confidence": 0.0
+    }
+  ]
+}

@@ -78,3 +78,21 @@ coverage/
 *.tmp
 *.temp
 .cache/
+
+# Training data - images are too large for git
+training_data/labeling_queue/*.jpg
+training_data/raw_videos/
+training_data/scraped_data/
+training_data/real_video_frames/
+training_data/keepups_dataset/
+training_data/experiments/
+
+# Model weights
+*.pt
+*.pth
+*.weights
+*.onnx
+
+# Labeling logs
+labeling.log
+nohup.out

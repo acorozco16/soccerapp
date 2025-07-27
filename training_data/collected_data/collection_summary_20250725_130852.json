@@ -1,0 +1,22 @@
+{
+  "started_at": "2025-07-25T13:08:52.753675",
+  "completed_at": "2025-07-25T13:08:52.759574",
+  "duration_seconds": 0.01,
+  "sources_attempted": [
+    "datasets"
+  ],
+  "sources_completed": [
+    "dataset"
+  ],
+  "sources_failed": [],
+  "total_items_collected": 0,
+  "items_by_source": {
+    "dataset": 0
+  },
+  "quality_distribution": {
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "errors": []
+}

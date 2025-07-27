@@ -11,6 +11,7 @@ from typing import Optional
 from database import init_db, SessionLocal
 from models import Video, ProcessingStatus
 from video_processor import VideoProcessor
+from health import get_health_status
 import logging
 
 # Configure logging
@@ -344,6 +345,45 @@ async def get_metadata(video_id: str):
         db.close()
 
 
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for monitoring and deployment"""
+    return get_health_status()
+
+
+# Training Dashboard Integration
+@app.get("/training-dashboard")
+async def training_dashboard():
+    """Serve the training dashboard"""
+    try:
+        from training_data.dashboard.dashboard_api import training_api
+        
+        # Import and include the training API routes
+        app.include_router(training_api, tags=["Training Automation"])
+        
+        # Redirect to the dashboard
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse(url="/training-api/")
+        
+    except ImportError as e:
+        logger.warning(f"Training dashboard not available: {e}")
+        return {"error": "Training dashboard not available", "message": str(e)}
+
+# Include training API routes if available
+# TEMPORARILY DISABLED - Path issues with logs directory
+# try:
+#     from training_data.dashboard.dashboard_api import training_api
+#     app.include_router(training_api, tags=["Training Automation"])
+#     logger.info("Training automation API enabled at /training-api")
+# except ImportError as e:
+#     logger.warning(f"Training automation API not available: {e}")
+
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+    import os
+    
+    port = int(os.getenv("PORT", 8000))
+    reload = os.getenv("ENVIRONMENT", "development") == "development"
+    
+    uvicorn.run(app, host="0.0.0.0", port=port, reload=reload)

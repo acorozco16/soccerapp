@@ -1,0 +1,41 @@
+{
+  "collection": {
+    "datasets": {
+      "source": "datasets",
+      "status": "completed",
+      "progress": 1.0,
+      "items_collected": 2,
+      "target_items": 2,
+      "current_operation": "Dataset downloads completed",
+      "start_time": "2025-07-25T13:28:45.471124",
+      "estimated_completion": "2025-07-25T13:08:52.758145",
+      "error_message": null
+    },
+    "comprehensive": {
+      "source": "comprehensive",
+      "status": "failed",
+      "progress": 1.0,
+      "items_collected": 0,
+      "target_items": 0,
+      "current_operation": "Data collection completed",
+      "start_time": null,
+      "estimated_completion": null,
+      "error_message": null
+    }
+  },
+  "training": {
+    "session_id": "progressive_20250725_133933",
+    "status": "failed",
+    "current_stage": "",
+    "progress": 0.0,
+    "epoch": 0,
+    "total_epochs": 0,
+    "current_accuracy": 0.0,
+    "best_accuracy": 0.0,
+    "start_time": null,
+    "estimated_completion": null,
+    "error_message": "Progressive training failed: Insufficient training data: 0 images available, minimum 100 required"
+  },
+  "system_health": null,
+  "last_updated": "2025-07-25T13:39:33.536331"
+}
