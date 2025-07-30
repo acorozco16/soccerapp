@@ -1,0 +1,17 @@
+# ByteTrack + YOLO v8 + EKF Dependencies
+ultralytics>=8.0.0
+filterpy>=1.4.5
+lap>=0.4.0
+cython-bbox>=0.1.3
+yolox>=0.3.0
+torch>=1.9.0
+torchvision>=0.10.0
+scipy>=1.7.0
+motmetrics>=1.2.0
+
+# Existing dependencies
+opencv-python>=4.5.0
+numpy>=1.21.0
+mediapipe>=0.8.9
+fastapi>=0.68.0
+uvicorn>=0.15.0

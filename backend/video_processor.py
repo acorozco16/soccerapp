@@ -12,6 +12,7 @@ import imageio
 from collections import deque
 import math
 from ultralytics import YOLO
+from bytetrack_tracker import BYTETracker, Detection
 
 logger = logging.getLogger(__name__)
 
@@ -65,22 +66,42 @@ class VideoProcessor:
         )
         self.mp_drawing = mp.solutions.drawing_utils
         
-        # Load improved YOLO model
+        # Load YOLO v8 model (prioritize v8, fallback to custom trained)
         try:
-            model_path = Path(__file__).parent.parent / "training_data/experiments/real_detector_v2/weights/best.pt"
-            if model_path.exists():
-                self.yolo_model = YOLO(str(model_path))
-                self.yolo_confidence_threshold = 0.01  # Lower threshold for new video type
-                print(f"✅ Loaded improved YOLO model: {model_path}")
-                logger.info(f"Loaded improved YOLO model with confidence threshold {self.yolo_confidence_threshold}")
+            # Try YOLO v8 first for better performance
+            self.yolo_model = YOLO('yolov8n.pt')  # Nano for speed, can upgrade to yolov8s.pt
+            self.yolo_confidence_threshold = 0.1  # Lower for ByteTrack two-stage matching
+            print(f"✅ Loaded YOLO v8 model")
+            logger.info(f"Loaded YOLO v8 model with confidence threshold {self.yolo_confidence_threshold}")
+            
+            # Also try custom trained model as backup
+            custom_model_path = Path(__file__).parent.parent / "models/soccer_ball_trained.pt"
+            if custom_model_path.exists():
+                self.custom_yolo_model = YOLO(str(custom_model_path))
+                print(f"✅ Also loaded custom trained model as backup: {custom_model_path}")
             else:
-                print(f"⚠️ Improved model not found, falling back to traditional detection")
-                logger.warning("Improved YOLO model not found, using traditional detection")
-                self.yolo_model = None
+                self.custom_yolo_model = None
+                
         except Exception as e:
-            print(f"❌ Failed to load YOLO model: {e}")
-            logger.error(f"Failed to load YOLO model: {e}")
-            self.yolo_model = None
+            print(f"❌ Failed to load YOLO v8, trying custom model: {e}")
+            try:
+                model_path = Path(__file__).parent.parent / "models/soccer_ball_trained.pt"
+                if model_path.exists():
+                    self.yolo_model = YOLO(str(model_path))
+                    self.yolo_confidence_threshold = 0.05
+                    self.custom_yolo_model = None
+                    print(f"✅ Loaded custom trained YOLO model: {model_path}")
+                    logger.info(f"Loaded custom trained YOLO model with confidence threshold {self.yolo_confidence_threshold}")
+                else:
+                    print(f"⚠️ No YOLO models found, falling back to traditional detection")
+                    logger.warning("No YOLO models found, using traditional detection")
+                    self.yolo_model = None
+                    self.custom_yolo_model = None
+            except Exception as e2:
+                print(f"❌ Failed to load any YOLO model: {e2}")
+                logger.error(f"Failed to load any YOLO model: {e2}")
+                self.yolo_model = None
+                self.custom_yolo_model = None
         
         # Traditional detection parameters (fallback)
         self.ball_color_ranges = {
@@ -124,6 +145,20 @@ class VideoProcessor:
         self.last_known_position = None
         self.frames_without_detection = 0
         
+        # Phase 2: Trajectory prediction for missed balls
+        self.trajectory_history = deque(maxlen=8)  # Store recent positions with timestamps
+        self.prediction_confidence_threshold = 0.5  # Increased from 0.3 to be more competitive
+        
+        # ByteTrack integration - Optimized for soccer ball tracking
+        self.bytetrack_tracker = BYTETracker(
+            frame_rate=30,
+            track_thresh=0.4,       # Lower threshold - soccer balls can have variable confidence
+            track_buffer=60,        # Longer buffer for fast-moving balls
+            match_thresh=0.7,       # Slightly lower for better association
+            high_thresh=0.5,        # Lower high threshold to capture more detections
+            low_thresh=0.05         # Very low - catch even weak detections
+        )
+        
         # Quality assessment thresholds
         self.quality_thresholds = {
             "min_brightness": 40,
@@ -133,16 +168,16 @@ class VideoProcessor:
             "max_shake_score": 50
         }
 
-    def _detect_ball_yolo(self, frame: np.ndarray) -> List[BallDetection]:
-        """YOLO-based ball detection with improved model"""
+    def _detect_ball_yolo_v8(self, frame: np.ndarray) -> List[Detection]:
+        """YOLO v8 ball detection with low confidence threshold for ByteTrack"""
         detections = []
         
         if self.yolo_model is None:
             return detections
         
         try:
-            # Run YOLO inference with optimized confidence
-            results = self.yolo_model(frame, conf=self.yolo_confidence_threshold, verbose=False)
+            # Run YOLO inference with optimized settings for ByteTrack
+            results = self.yolo_model(frame, conf=0.01, iou=0.3, verbose=False)  # Ultra-low conf, lower IoU
             
             for result in results:
                 boxes = result.boxes
@@ -152,27 +187,58 @@ class VideoProcessor:
                         conf = float(box.conf[0])
                         x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
                         
-                        # Calculate center position
-                        center_x = int((x1 + x2) / 2)
-                        center_y = int((y1 + y2) / 2)
-                        
-                        # Calculate radius from bounding box
-                        radius = int(max(x2 - x1, y2 - y1) / 2)
-                        
-                        # Enhanced confidence scoring for real data model
-                        enhanced_conf = min(conf * 1.5, 1.0)  # Boost confidence slightly
-                        
-                        detections.append(BallDetection(
-                            position=(center_x, center_y),
-                            confidence=float(enhanced_conf),
-                            method="yolo_v2",
-                            radius=radius
-                        ))
+                        # Filter for sports ball class (class 32 in COCO)
+                        class_id = int(box.cls[0])
+                        if class_id == 32:  # Sports ball in COCO dataset
+                            detections.append(Detection(
+                                bbox=(float(x1), float(y1), float(x2), float(y2)),
+                                confidence=conf,
+                                class_id=class_id
+                            ))
         
         except Exception as e:
-            logger.warning(f"YOLO detection failed: {e}")
+            logger.warning(f"YOLO v8 detection failed: {e}")
+        
+        # Fallback to custom model if available
+        if not detections and self.custom_yolo_model is not None:
+            try:
+                results = self.custom_yolo_model(frame, conf=0.05, verbose=False)
+                for result in results:
+                    boxes = result.boxes
+                    if boxes is not None and len(boxes) > 0:
+                        for box in boxes:
+                            conf = float(box.conf[0])
+                            x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
+                            detections.append(Detection(
+                                bbox=(float(x1), float(y1), float(x2), float(y2)),
+                                confidence=conf,
+                                class_id=0  # Custom model class
+                            ))
+            except Exception as e:
+                logger.warning(f"Custom YOLO detection failed: {e}")
         
         return detections
+
+    def _detect_ball_yolo_legacy(self, frame: np.ndarray) -> List[BallDetection]:
+        """Legacy YOLO detection for backwards compatibility"""
+        yolo_detections = self._detect_ball_yolo_v8(frame)
+        
+        # Convert to legacy format
+        legacy_detections = []
+        for det in yolo_detections:
+            x1, y1, x2, y2 = det.bbox
+            center_x = int((x1 + x2) / 2)
+            center_y = int((y1 + y2) / 2)
+            radius = int(max(x2 - x1, y2 - y1) / 2)
+            
+            legacy_detections.append(BallDetection(
+                position=(center_x, center_y),
+                confidence=det.confidence,
+                method="yolo_v8",
+                radius=radius
+            ))
+        
+        return legacy_detections
 
     def _detect_ball_traditional(self, frame: np.ndarray) -> List[BallDetection]:
         """Traditional HSV + Hough circle detection as fallback"""
@@ -235,11 +301,12 @@ class VideoProcessor:
             
             # Method priority weights (prefer our improved YOLO model)
             method_weights = {
-                "yolo_v2": 10.0,     # Very strong preference for YOLO model
+                "yolo_v2": 10.0,                # Very strong preference for YOLO model
                 "hough_1": 1.0,
                 "hough_2": 0.9,
                 "contour": 0.8,
                 "motion": 0.7,
+                "trajectory_prediction": 2.0,   # Phase 2: Higher priority for physics prediction
                 "prediction": 0.5
             }
             
@@ -270,31 +337,115 @@ class VideoProcessor:
         
         return best_detection
 
-    def _detect_ball(self, frame: np.ndarray, frame_number: int, foot_positions: List[Tuple[int, int]]) -> Optional[BallDetection]:
-        """Enhanced ball detection with YOLO v2 + traditional fallback"""
+    def _predict_ball_position(self, timestamp: float) -> Optional[BallDetection]:
+        """Phase 2: Predict ball position using trajectory physics when YOLO fails"""
+        if len(self.trajectory_history) < 3:
+            return None
+        
+        # Get last 3 positions for physics calculation
+        recent_positions = list(self.trajectory_history)[-3:]
+        
+        # Calculate time intervals
+        dt1 = recent_positions[1]['timestamp'] - recent_positions[0]['timestamp']
+        dt2 = recent_positions[2]['timestamp'] - recent_positions[1]['timestamp']
+        dt_predict = timestamp - recent_positions[2]['timestamp']
+        
+        if dt1 <= 0 or dt2 <= 0 or dt_predict <= 0 or dt_predict > 0.2:  # Max 0.2s prediction
+            return None
+        
+        # Physics-based prediction using position, velocity, and acceleration
+        pos1 = recent_positions[0]['position']
+        pos2 = recent_positions[1]['position'] 
+        pos3 = recent_positions[2]['position']
+        
+        # Calculate velocities
+        vel1_x = (pos2[0] - pos1[0]) / dt1
+        vel1_y = (pos2[1] - pos1[1]) / dt1
+        vel2_x = (pos3[0] - pos2[0]) / dt2
+        vel2_y = (pos3[1] - pos2[1]) / dt2
+        
+        # Calculate acceleration
+        accel_x = (vel2_x - vel1_x) / dt2
+        accel_y = (vel2_y - vel1_y) / dt2
+        
+        # Add gravity effect (pixels/second²)
+        gravity_effect = 200 * dt_predict * dt_predict  # Approximate gravity in pixel space
+        
+        # Predict position using kinematic equations
+        predicted_x = pos3[0] + vel2_x * dt_predict + 0.5 * accel_x * dt_predict * dt_predict
+        predicted_y = pos3[1] + vel2_y * dt_predict + 0.5 * accel_y * dt_predict * dt_predict + gravity_effect
+        
+        # Validate prediction is reasonable (within frame bounds with margin)
+        if predicted_x < -100 or predicted_x > 1380 or predicted_y < -100 or predicted_y > 900:
+            return None
+        
+        # Calculate confidence based on trajectory consistency
+        trajectory_consistency = self._calculate_trajectory_consistency(recent_positions)
+        confidence = min(self.prediction_confidence_threshold + trajectory_consistency * 0.4, 0.9)  # Increased max confidence
+        
+        return BallDetection(
+            position=(int(predicted_x), int(predicted_y)),
+            confidence=confidence,
+            method="trajectory_prediction",
+            radius=15  # Estimated radius
+        )
+    
+    def _calculate_trajectory_consistency(self, positions: List[Dict]) -> float:
+        """Calculate how consistent the ball trajectory is for prediction confidence"""
+        if len(positions) < 3:
+            return 0.0
+        
+        # Check if positions form a smooth trajectory
+        distances = []
+        for i in range(1, len(positions)):
+            dist = math.sqrt(
+                (positions[i]['position'][0] - positions[i-1]['position'][0]) ** 2 +
+                (positions[i]['position'][1] - positions[i-1]['position'][1]) ** 2
+            )
+            distances.append(dist)
+        
+        # More consistent distances = higher confidence
+        avg_distance = sum(distances) / len(distances)
+        variance = sum((d - avg_distance) ** 2 for d in distances) / len(distances)
+        
+        # Convert variance to confidence (lower variance = higher confidence)
+        consistency = max(0, 1 - variance / (avg_distance ** 2)) if avg_distance > 0 else 0
+        return min(consistency, 1.0)
+
+    def _detect_ball(self, frame: np.ndarray, frame_number: int, foot_positions: List[Tuple[int, int]], timestamp: float = 0.0) -> Optional[BallDetection]:
+        """Enhanced ball detection with YOLO v2 + traditional fallback + trajectory prediction"""
         all_detections = []
         
-        # Primary: YOLO v2 detection
-        yolo_detections = self._detect_ball_yolo(frame)
+        # Primary: YOLO v8 detection (legacy format)
+        yolo_detections = self._detect_ball_yolo_legacy(frame)
         all_detections.extend(yolo_detections)
         
         # Always run both YOLO and traditional detection, let best selection decide
         traditional_detections = self._detect_ball_traditional(frame)
         all_detections.extend(traditional_detections)
         
-        # Only skip traditional if YOLO has very high confidence
-        if False:  # Always run both for now
-            traditional_detections = self._detect_ball_traditional(frame)
-            all_detections.extend(traditional_detections)
+        # Phase 2: Try trajectory prediction more aggressively
+        if not all_detections or max(d.confidence for d in all_detections) < 0.6:
+            predicted_detection = self._predict_ball_position(timestamp)
+            if predicted_detection:
+                all_detections.append(predicted_detection)
         
         # Choose best detection
         best_detection = self._choose_best_detection(all_detections, foot_positions)
         
-        # Update tracking
+        # Update tracking and trajectory history
         if best_detection:
             self.frames_without_detection = 0
             self.ball_history.append(best_detection)
             self.last_known_position = best_detection.position
+            
+            # Update trajectory history for physics prediction
+            self.trajectory_history.append({
+                'timestamp': timestamp,
+                'position': best_detection.position,
+                'confidence': best_detection.confidence,
+                'method': best_detection.method
+            })
         else:
             self.frames_without_detection += 1
         
@@ -326,6 +477,53 @@ class VideoProcessor:
         
         return foot_positions
     
+    def _infer_trajectory_touch(self, timestamp: float, foot_positions: List[Tuple[int, int]]) -> Optional[TouchEvent]:
+        """Phase 2b: Infer touches from ball trajectory changes near feet"""
+        if len(self.trajectory_history) < 4 or not foot_positions:
+            return None
+        
+        # Get recent trajectory points
+        recent_points = list(self.trajectory_history)[-4:]
+        
+        # Calculate trajectory change (direction change indicates contact)
+        direction_changes = []
+        for i in range(1, len(recent_points)-1):
+            prev_pos = recent_points[i-1]['position']
+            curr_pos = recent_points[i]['position']
+            next_pos = recent_points[i+1]['position']
+            
+            # Calculate direction vectors
+            vec1 = (curr_pos[0] - prev_pos[0], curr_pos[1] - prev_pos[1])
+            vec2 = (next_pos[0] - curr_pos[0], next_pos[1] - curr_pos[1])
+            
+            # Calculate angle change (dot product)
+            if (vec1[0] != 0 or vec1[1] != 0) and (vec2[0] != 0 or vec2[1] != 0):
+                dot_product = vec1[0] * vec2[0] + vec1[1] * vec2[1]
+                mag1 = (vec1[0]**2 + vec1[1]**2)**0.5
+                mag2 = (vec2[0]**2 + vec2[1]**2)**0.5
+                
+                if mag1 > 0 and mag2 > 0:
+                    cos_angle = dot_product / (mag1 * mag2)
+                    angle_change = abs(1 - cos_angle)  # 0 = no change, 2 = complete reversal
+                    
+                    # Check if ball was near foot during direction change
+                    min_foot_distance = min(
+                        ((curr_pos[0] - fp[0])**2 + (curr_pos[1] - fp[1])**2)**0.5
+                        for fp in foot_positions
+                    )
+                    
+                    if angle_change > 0.3 and min_foot_distance < 100:  # More sensitive thresholds
+                        logger.info(f"🎯 Trajectory touch inferred: angle_change={angle_change:.2f}, distance={min_foot_distance:.1f}")
+                        return TouchEvent(
+                            timestamp=recent_points[i]['timestamp'],
+                            frame_number=int(recent_points[i]['timestamp'] * 60),  # Estimate frame
+                            confidence=min(0.8, angle_change * 0.9 + 0.1),
+                            position=curr_pos,
+                            detection_method="trajectory_inference"
+                        )
+        
+        return None
+
     def _check_touch(self, ball_pos: Tuple[int, int], foot_positions: List[Tuple[int, int]], 
                      last_ball_pos: Optional[Tuple[int, int]], timestamp: float, 
                      last_touch_time: float) -> Tuple[bool, float]:
@@ -543,6 +741,52 @@ class VideoProcessor:
         
         return smoothed_events
 
+    def _calculate_touch_range(self, detected_touches: int, confidence: float, quality_assessment: Optional[VideoQuality]) -> Dict:
+        """Calculate touch count range based on detection confidence and video quality"""
+        
+        # Base uncertainty factors
+        base_uncertainty = 2  # ±2 touches base uncertainty
+        
+        # Adjust uncertainty based on confidence score
+        if confidence >= 0.8:
+            confidence_factor = 0.5  # High confidence: smaller range
+        elif confidence >= 0.6:
+            confidence_factor = 1.0  # Medium confidence: normal range
+        else:
+            confidence_factor = 1.5  # Low confidence: larger range
+        
+        # Adjust uncertainty based on video quality
+        quality_factor = 1.0
+        if quality_assessment:
+            if quality_assessment.overall_score >= 0.8:
+                quality_factor = 0.8  # High quality: smaller range
+            elif quality_assessment.overall_score >= 0.6:
+                quality_factor = 1.0  # Good quality: normal range
+            else:
+                quality_factor = 1.3  # Poor quality: larger range
+        
+        # Calculate range bounds
+        uncertainty = int(base_uncertainty * confidence_factor * quality_factor)
+        uncertainty = max(1, min(uncertainty, 5))  # Clamp between 1-5
+        
+        # Calculate range ensuring it doesn't go below 0
+        range_min = max(0, detected_touches - uncertainty)
+        range_max = detected_touches + uncertainty
+        
+        # Special handling for very low counts
+        if detected_touches <= 3:
+            range_min = max(0, detected_touches - 1)
+            range_max = detected_touches + 2
+        
+        return {
+            "min": range_min,
+            "max": range_max,
+            "display": f"{range_min}-{range_max} touches",
+            "detected_count": detected_touches,
+            "confidence_level": "high" if confidence >= 0.7 else "medium" if confidence >= 0.5 else "low",
+            "explanation": f"Detected {detected_touches} touches with {confidence:.0%} confidence"
+        }
+
     def _get_detection_summary(self) -> Dict:
         """Get summary of detection methods used"""
         if not self.ball_history:
@@ -576,12 +820,13 @@ class VideoProcessor:
         if ball_pos:
             # Method-specific colors
             method_colors = {
-                "yolo_v2": (0, 255, 0),       # Green for improved YOLO
-                "hough_1": (0, 0, 255),       # Red
-                "hough_2": (0, 100, 255),     # Orange-red
-                "contour": (0, 255, 255),     # Yellow
-                "motion": (255, 0, 255),      # Magenta
-                "prediction": (128, 128, 128) # Gray
+                "yolo_v2": (0, 255, 0),             # Green for improved YOLO
+                "hough_1": (0, 0, 255),             # Red
+                "hough_2": (0, 100, 255),           # Orange-red
+                "contour": (0, 255, 255),           # Yellow
+                "motion": (255, 0, 255),            # Magenta
+                "trajectory_prediction": (255, 165, 0),  # Orange for physics prediction
+                "prediction": (128, 128, 128)       # Gray
             }
             
             color = method_colors.get(
@@ -636,6 +881,9 @@ class VideoProcessor:
         frame_count = 0
         processed_frames = 0
         
+        # Smart sampling: Track high-resolution processing
+        self._high_res_frames_remaining = 0
+        
         # Video orientation tracking
         video_orientation = None
         orientation_detected = False
@@ -656,8 +904,21 @@ class VideoProcessor:
                 if not ret:
                     break
                 
-                # Skip frames for efficiency
-                if frame_count % self.frame_skip != 0:
+                # SMART FRAME SAMPLING - Process all frames when ball might be near feet
+                should_process_frame = False
+                
+                # Always process every Nth frame (normal sampling)
+                if frame_count % self.frame_skip == 0:
+                    should_process_frame = True
+                
+                # CRITICAL: Also process if we're in high-resolution mode
+                # (This will be set when ball is detected near feet)
+                elif hasattr(self, '_high_res_frames_remaining') and self._high_res_frames_remaining > 0:
+                    should_process_frame = True
+                    self._high_res_frames_remaining -= 1
+                
+                # Skip this frame if neither condition is met
+                if not should_process_frame:
                     frame_count += 1
                     continue
                 
@@ -687,10 +948,68 @@ class VideoProcessor:
                 pose_results = self.pose.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
                 foot_positions = self._get_foot_positions(pose_results, frame.shape)
                 
-                # Enhanced ball detection with improved model
-                ball_detection = self._detect_ball(frame, frame_count, foot_positions)
+                # PHASE 1: ByteTrack Detection + Tracking
+                yolo_detections = self._detect_ball_yolo_v8(frame)
+                tracks = self.bytetrack_tracker.update(yolo_detections)
                 
-                # Check for touches
+                # Convert best track to legacy ball detection format with enhanced logic
+                ball_detection = None
+                if tracks:
+                    # Multi-track logic: prioritize longest tracks and foot proximity
+                    if foot_positions:
+                        # Find track closest to feet (likely the ball being juggled)
+                        best_track = None
+                        min_foot_distance = float('inf')
+                        
+                        for track in tracks:
+                            x1, y1, x2, y2 = track.bbox
+                            track_center = ((x1 + x2) / 2, (y1 + y2) / 2)
+                            
+                            # Find distance to nearest foot
+                            for foot_x, foot_y in foot_positions:
+                                distance = ((track_center[0] - foot_x)**2 + (track_center[1] - foot_y)**2)**0.5
+                                if distance < min_foot_distance:
+                                    min_foot_distance = distance
+                                    best_track = track
+                        
+                        # If no track near feet, use highest confidence
+                        if best_track is None:
+                            best_track = max(tracks, key=lambda t: t.confidence)
+                    else:
+                        # No pose detected, use highest confidence track
+                        best_track = max(tracks, key=lambda t: t.confidence)
+                    
+                    x1, y1, x2, y2 = best_track.bbox
+                    center_x = int((x1 + x2) / 2)
+                    center_y = int((y1 + y2) / 2)
+                    radius = int(max(x2 - x1, y2 - y1) / 2)
+                    
+                    ball_detection = BallDetection(
+                        position=(center_x, center_y),
+                        confidence=best_track.confidence,
+                        method="bytetrack_yolo_v8",
+                        radius=radius
+                    )
+                
+                # Fallback to legacy detection if no tracks
+                if ball_detection is None:
+                    ball_detection = self._detect_ball(frame, frame_count, foot_positions, timestamp)
+                
+                # ENHANCED SMART SAMPLING: More aggressive for ByteTrack
+                if ball_detection and foot_positions:
+                    ball_x, ball_y = ball_detection.position
+                    for foot_x, foot_y in foot_positions:
+                        distance = ((ball_x - foot_x)**2 + (ball_y - foot_y)**2)**0.5
+                        # If ball within 200 pixels of any foot, process next 45 frames
+                        if distance < 200:  # Increased range
+                            self._high_res_frames_remaining = 45  # ~1.5 seconds at 30fps
+                            break
+                
+                # ADDITIONAL: If we have multiple tracks, stay in high-res mode
+                if tracks and len(tracks) > 1:
+                    self._high_res_frames_remaining = max(self._high_res_frames_remaining, 15)
+                
+                # Check for touches (traditional method)
                 if ball_detection and foot_positions:
                     touch_detected, confidence = self._check_touch(
                         ball_detection.position, foot_positions, last_ball_pos, timestamp, last_touch_time
@@ -714,6 +1033,21 @@ class VideoProcessor:
                         debug_frame_path = frames_dir / f"touch_{len(touch_events)}.jpg"
                         cv2.imwrite(str(debug_frame_path), debug_frame)
                         debug_frames.append(f"touch_{len(touch_events)}.jpg")
+                
+                # Phase 2b: Check for trajectory-based touches (catches missed touches)
+                if processed_frames % 5 == 0:  # Check every 5 frames for more sensitivity
+                    trajectory_touch = self._infer_trajectory_touch(timestamp, foot_positions)
+                    if trajectory_touch and timestamp - last_touch_time > self.debounce_time:
+                        touch_events.append(trajectory_touch)
+                        last_touch_time = trajectory_touch.timestamp
+                        
+                        # Create debug frame for trajectory-inferred touch
+                        debug_frame = self._create_debug_frame(
+                            frame.copy(), trajectory_touch.position, foot_positions, pose_results
+                        )
+                        debug_frame_path = frames_dir / f"touch_{len(touch_events)}_trajectory.jpg"
+                        cv2.imwrite(str(debug_frame_path), debug_frame)
+                        debug_frames.append(f"touch_{len(touch_events)}_trajectory.jpg")
                 
                 # Update ball position
                 if ball_detection:
@@ -770,11 +1104,13 @@ class VideoProcessor:
         # Calculate confidence score with method weighting
         if smoothed_touch_events:
             method_weights = {
-                "yolo_v2": 1.2,    # Higher weight for improved model
+                "yolo_v2": 1.2,                # Higher weight for improved model
                 "hough_1": 1.0,
                 "hough_2": 0.9,
                 "contour": 0.8,
                 "motion": 0.7,
+                "trajectory_prediction": 0.8,  # Phase 2: Good weight for physics prediction
+                "trajectory_inference": 0.9,   # Phase 2b: High weight for direction-change touches
                 "prediction": 0.5
             }
             
@@ -790,8 +1126,12 @@ class VideoProcessor:
         else:
             avg_confidence = 0.0
         
+        # Calculate touch count range based on confidence and video quality
+        touch_range = self._calculate_touch_range(total_touches, avg_confidence, quality_assessment)
+        
         results = {
             "total_ball_touches": total_touches,
+            "touch_range": touch_range,
             "video_duration": metadata["duration"],
             "touches_per_minute": round(touches_per_minute, 1),
             "confidence_score": round(avg_confidence, 2),

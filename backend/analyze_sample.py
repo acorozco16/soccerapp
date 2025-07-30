@@ -48,7 +48,16 @@ async def analyze_video(video_path: str, output_dir: str = None):
         # Display results
         print("\n✅ Analysis Complete!")
         print("=" * 50)
-        print(f"📊 Total Ball Touches: {results['total_ball_touches']}")
+        
+        # Show range display (primary result)
+        if 'touch_range' in results:
+            touch_range = results['touch_range']
+            print(f"⚽ Ball Touches: {touch_range['display']}")
+            print(f"📊 Detected Count: {results['total_ball_touches']} (confidence: {touch_range['confidence_level']})")
+            print(f"💡 {touch_range['explanation']}")
+        else:
+            print(f"📊 Total Ball Touches: {results['total_ball_touches']}")
+        
         print(f"⏱️  Video Duration: {results['video_duration']:.1f} seconds")
         print(f"⚡ Touches per Minute: {results['touches_per_minute']}")
         print(f"🎯 Confidence Score: {results['confidence_score']}")
