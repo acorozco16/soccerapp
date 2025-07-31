@@ -1,0 +1,58 @@
+# EAS Build ignore file - exclude everything not needed for mobile build
+
+# Node modules (EAS reinstalls these)
+node_modules/
+
+# Build outputs and cache
+.expo/
+build/
+dist/
+.cache/
+
+# Version control
+.git/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Documentation that's not needed for build
+*.md
+BUILD_GUIDE.md
+CHECK_LOGIN.md
+
+# Any video files (if accidentally in project)
+*.mp4
+*.mov
+*.avi
+
+# Python files (not needed for React Native)
+*.py
+*.pyc
+__pycache__/
+
+# Model files (not needed for mobile)
+*.pt
+*.pth
+*.h5
+
+# Large data files
+*.db
+*.sqlite
+*.json.gz
+
+# Exclude parent directory contents entirely
+../training_data
+../uploads  
+../backend
+../models
+../runs
+../frontend
