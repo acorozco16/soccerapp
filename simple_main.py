@@ -24,11 +24,25 @@ async def health():
 # Mock auth endpoints for testing
 @app.post("/auth/login")
 async def login():
-    return {"message": "Login successful", "token": "mock_token_123"}
+    return {
+        "access_token": "mock_token_123",
+        "user": {
+            "id": "mock_user_123",
+            "email": "test@example.com",
+            "full_name": "Test User"
+        }
+    }
 
 @app.post("/auth/register") 
 async def register():
-    return {"message": "Registration successful", "user_id": "mock_user_123"}
+    return {
+        "access_token": "mock_token_456",
+        "user": {
+            "id": "mock_user_456",
+            "email": "newuser@example.com",
+            "full_name": "New User"
+        }
+    }
 
 @app.get("/drill/available")
 async def available_drills():
