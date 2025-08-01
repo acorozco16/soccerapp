@@ -11,6 +11,6 @@ psutil==5.9.7
 requests==2.31.0
 email-validator==2.1.0
 
-# Computer Vision (simplified for beta)
-numpy==1.24.3
-Pillow==10.2.0
+# Computer Vision (Python 3.13 compatible)
+numpy>=1.26.0
+Pillow>=10.0.0
