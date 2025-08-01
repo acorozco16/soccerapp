@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: soccerapp-backend
+    env: python
+    buildCommand: "cd backend && pip install -r requirements.txt"
+    startCommand: "cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: SUPABASE_URL
+        value: https://nxumfeldylzpqwqlvszz.supabase.co
+      - key: SUPABASE_ANON_KEY
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im54dW1mZWxkeWx6cHF3cWx2c3p6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5MTY1NDksImV4cCI6MjA2OTQ5MjU0OX0.D2WvA9Ld2YalWbum6qi5CBvXxmj75v1BuDb-NKrJkxo
