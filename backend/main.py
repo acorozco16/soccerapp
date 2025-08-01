@@ -8,15 +8,25 @@ from datetime import datetime, timedelta
 import asyncio
 from typing import Optional
 
-from database import init_db, SessionLocal
-from models import Video, ProcessingStatus
-from video_processor import VideoProcessor
-from health import get_health_status
+# Configure logging first
 import logging
-
-# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+from database import init_db, SessionLocal
+from models import Video, ProcessingStatus
+from health import get_health_status
+from drill_api import drill_router
+from auth_api import auth_router
+
+# Conditional import for video processor (only needed for actual video processing)
+try:
+    from video_processor import VideoProcessor
+    VIDEO_PROCESSING_ENABLED = True
+except ImportError as e:
+    logger.warning(f"Video processing disabled - missing dependencies: {e}")
+    VideoProcessor = None
+    VIDEO_PROCESSING_ENABLED = False
 
 # Initialize FastAPI app
 app = FastAPI(title="Soccer Video Analysis API", version="1.0.0")
@@ -32,6 +42,12 @@ app.add_middleware(
 
 # Initialize database
 init_db()
+
+# Include drill analysis router
+app.include_router(drill_router)
+
+# Include authentication router
+app.include_router(auth_router)
 
 # Configure upload paths
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -129,6 +145,10 @@ async def upload_video(
 
 async def process_video(video_id: str, file_path: str):
     """Background task to process uploaded video"""
+    if not VIDEO_PROCESSING_ENABLED:
+        logger.error(f"Video processing disabled for {video_id} - missing dependencies")
+        return
+        
     processor = VideoProcessor()
     db = SessionLocal()
     

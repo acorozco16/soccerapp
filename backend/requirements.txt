@@ -11,10 +11,6 @@ psutil==5.9.7
 requests==2.31.0
 email-validator==2.1.0
 
-# Computer Vision (essential)
-opencv-python-headless==4.9.0.80
+# Computer Vision (simplified for beta)
 numpy==1.24.3
 Pillow==10.2.0
-imageio==2.33.1
-imageio-ffmpeg==0.4.9
-mediapipe==0.10.9
