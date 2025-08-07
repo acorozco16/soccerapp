@@ -24,6 +24,7 @@ class TouchEvent:
     confidence: float
     position: Tuple[int, int]
     detection_method: str
+    foot_used: Optional[str] = None  # "left", "right", or None for juggling
     
     def to_dict(self):
         return {
@@ -31,7 +32,29 @@ class TouchEvent:
             "frame": self.frame_number,
             "confidence": self.confidence,
             "position": self.position,
-            "detection_method": self.detection_method
+            "detection_method": self.detection_method,
+            "foot_used": self.foot_used
+        }
+
+
+@dataclass  
+class BellTouchEvent:
+    timestamp: float
+    frame_number: int
+    confidence: float
+    position: Tuple[int, int]
+    foot_used: str  # "left" or "right"
+    sequence_number: int  # Track alternating sequence
+    
+    def to_dict(self):
+        return {
+            "timestamp": self.timestamp,
+            "frame": self.frame_number,
+            "confidence": self.confidence,
+            "position": self.position,
+            "foot_used": self.foot_used,
+            "sequence_number": self.sequence_number,
+            "detection_method": "bell_touches"
         }
 
 
@@ -239,6 +262,96 @@ class VideoProcessor:
             ))
         
         return legacy_detections
+
+    def _classify_touching_foot(self, ball_pos: Tuple[int, int], foot_positions: List[Tuple[int, int]]) -> Optional[str]:
+        """Determine which foot (left/right) is touching the ball"""
+        if len(foot_positions) < 2:
+            return None
+            
+        ball_x, ball_y = ball_pos
+        
+        # Assume foot_positions = [left_foot, right_foot] from MediaPipe
+        left_foot_x, left_foot_y = foot_positions[0] 
+        right_foot_x, right_foot_y = foot_positions[1]
+        
+        # Calculate distances to each foot
+        left_distance = math.sqrt((ball_x - left_foot_x)**2 + (ball_y - left_foot_y)**2)
+        right_distance = math.sqrt((ball_x - right_foot_x)**2 + (ball_y - right_foot_y)**2)
+        
+        # Touch threshold for Bell Touches (closer than juggling)
+        BELL_TOUCH_THRESHOLD = 40  # pixels
+        
+        if left_distance < BELL_TOUCH_THRESHOLD and left_distance < right_distance:
+            return "left"
+        elif right_distance < BELL_TOUCH_THRESHOLD and right_distance < left_distance:
+            return "right"
+        
+        return None
+
+    def _is_bell_touch_pattern(self, ball_detection: BallDetection, foot_positions: List[Tuple[int, int]]) -> bool:
+        """Determine if ball movement indicates Bell Touches vs juggling"""
+        if not ball_detection or len(foot_positions) < 2:
+            return False
+            
+        ball_x, ball_y = ball_detection.position
+        
+        # Bell Touches characteristics:
+        # 1. Ball stays low (near ground level)
+        # 2. Ball moves horizontally between feet
+        # 3. Ball doesn't go high in the air
+        
+        # Check ball height - Bell Touches stay lower than juggling
+        frame_height = 720  # Assume standard frame height
+        ground_level_threshold = frame_height * 0.75  # Bottom 25% of frame
+        
+        if ball_y < ground_level_threshold:
+            return False  # Ball too high for Bell Touches
+            
+        # Check if ball is between feet horizontally
+        left_foot_x = foot_positions[0][0]
+        right_foot_x = foot_positions[1][0]
+        
+        min_foot_x = min(left_foot_x, right_foot_x)
+        max_foot_x = max(left_foot_x, right_foot_x)
+        
+        # Ball should be roughly between feet for Bell Touches
+        if min_foot_x <= ball_x <= max_foot_x:
+            return True
+            
+        return False
+
+    def _detect_bell_touches(self, ball_detection: BallDetection, foot_positions: List[Tuple[int, int]], 
+                           timestamp: float, frame_number: int) -> Optional[BellTouchEvent]:
+        """Detect Bell Touches - alternating touches between feet at ground level"""
+        
+        if not self._is_bell_touch_pattern(ball_detection, foot_positions):
+            return None
+            
+        touching_foot = self._classify_touching_foot(ball_detection.position, foot_positions)
+        if not touching_foot:
+            return None
+            
+        # Check for alternating pattern
+        if not hasattr(self, '_last_bell_touch_foot'):
+            self._last_bell_touch_foot = None
+            self._bell_touch_sequence = 0
+            
+        # Validate alternating pattern (can't be same foot twice in a row)
+        if self._last_bell_touch_foot == touching_foot:
+            return None  # Same foot as last touch, not valid Bell Touches
+            
+        # Valid alternating touch detected
+        self._bell_touch_sequence += 1
+        self._last_bell_touch_foot = touching_foot
+        
+        return BellTouchEvent(
+            timestamp=timestamp,
+            frame_number=frame_number,
+            confidence=ball_detection.confidence,
+            position=ball_detection.position,
+            foot_used=touching_foot,
+            sequence_number=self._bell_touch_sequence
+        )
 
     def _detect_ball_traditional(self, frame: np.ndarray) -> List[BallDetection]:
         """Traditional HSV + Hough circle detection as fallback"""
@@ -787,6 +900,119 @@ class VideoProcessor:
             "explanation": f"Detected {detected_touches} touches with {confidence:.0%} confidence"
         }
 
+    def _calculate_bell_touch_range(self, detected_bell_touches: int, confidence: float, quality_assessment: Optional[VideoQuality]) -> Dict:
+        """Calculate Bell Touches count range based on detection confidence and video quality"""
+        
+        # Bell Touches have different uncertainty characteristics than juggling
+        base_uncertainty = 1  # ±1 touch base uncertainty (more precise than juggling)
+        
+        # Adjust uncertainty based on confidence score
+        if confidence >= 0.8:
+            confidence_factor = 0.5  # High confidence: smaller range
+        elif confidence >= 0.6:
+            confidence_factor = 0.8  # Medium confidence: smaller range than juggling
+        else:
+            confidence_factor = 1.2  # Low confidence: larger range
+        
+        # Adjust uncertainty based on video quality
+        quality_factor = 1.0
+        if quality_assessment:
+            if quality_assessment.overall_score >= 0.8:
+                quality_factor = 0.7  # High quality: smaller range
+            elif quality_assessment.overall_score >= 0.6:
+                quality_factor = 1.0  # Good quality: normal range
+            else:
+                quality_factor = 1.2  # Poor quality: larger range
+        
+        # Calculate range bounds
+        uncertainty = int(base_uncertainty * confidence_factor * quality_factor)
+        uncertainty = max(1, min(uncertainty, 3))  # Clamp between 1-3 (tighter than juggling)
+        
+        # Calculate range ensuring it doesn't go below 0
+        range_min = max(0, detected_bell_touches - uncertainty)
+        range_max = detected_bell_touches + uncertainty
+        
+        # Special handling for very low counts
+        if detected_bell_touches <= 2:
+            range_min = max(0, detected_bell_touches - 1)
+            range_max = detected_bell_touches + 1
+        
+        return {
+            "min": range_min,
+            "max": range_max,
+            "display": f"{range_min}-{range_max} bell touches",
+            "detected_count": detected_bell_touches,
+            "confidence_level": "high" if confidence >= 0.7 else "medium" if confidence >= 0.5 else "low",
+            "explanation": f"Detected {detected_bell_touches} alternating bell touches with {confidence:.0%} confidence"
+        }
+
+    def _analyze_alternating_pattern(self, bell_touches: List[BellTouchEvent]) -> Dict:
+        """Analyze the alternating pattern quality of Bell Touches"""
+        if len(bell_touches) < 2:
+            return {"pattern_quality": "insufficient_data", "alternating_score": 0}
+        
+        # Count foot alternations
+        alternations = 0
+        same_foot_errors = 0
+        
+        for i in range(1, len(bell_touches)):
+            if bell_touches[i].foot_used != bell_touches[i-1].foot_used:
+                alternations += 1
+            else:
+                same_foot_errors += 1
+        
+        total_transitions = len(bell_touches) - 1
+        alternating_score = alternations / total_transitions if total_transitions > 0 else 0
+        
+        # Determine pattern quality
+        if alternating_score >= 0.9:
+            pattern_quality = "excellent"
+        elif alternating_score >= 0.7:
+            pattern_quality = "good"
+        elif alternating_score >= 0.5:
+            pattern_quality = "fair"
+        else:
+            pattern_quality = "poor"
+        
+        return {
+            "pattern_quality": pattern_quality,
+            "alternating_score": round(alternating_score, 2),
+            "total_alternations": alternations,
+            "same_foot_errors": same_foot_errors,
+            "foot_distribution": self._analyze_foot_distribution(bell_touches)
+        }
+
+    def _analyze_foot_distribution(self, bell_touches: List[BellTouchEvent]) -> Dict:
+        """Analyze left vs right foot usage in Bell Touches"""
+        left_count = sum(1 for bt in bell_touches if bt.foot_used == "left")
+        right_count = sum(1 for bt in bell_touches if bt.foot_used == "right")
+        total = len(bell_touches)
+        
+        if total == 0:
+            return {"left_percentage": 0, "right_percentage": 0, "balance": "no_data"}
+        
+        left_percentage = (left_count / total) * 100
+        right_percentage = (right_count / total) * 100
+        
+        # Determine balance quality
+        balance_difference = abs(left_percentage - right_percentage)
+        if balance_difference <= 10:
+            balance = "excellent"
+        elif balance_difference <= 20:
+            balance = "good"
+        elif balance_difference <= 30:
+            balance = "fair"
+        else:
+            balance = "unbalanced"
+        
+        return {
+            "left_percentage": round(left_percentage, 1),
+            "right_percentage": round(right_percentage, 1),
+            "balance": balance,
+            "left_count": left_count,
+            "right_count": right_count
+        }
+
     def _get_detection_summary(self) -> Dict:
         """Get summary of detection methods used"""
         if not self.ball_history:
@@ -1034,6 +1260,25 @@ class VideoProcessor:
                         cv2.imwrite(str(debug_frame_path), debug_frame)
                         debug_frames.append(f"touch_{len(touch_events)}.jpg")
                 
+                # BELL TOUCHES DETECTION - New drill type
+                if ball_detection and foot_positions:
+                    bell_touch = self._detect_bell_touches(ball_detection, foot_positions, timestamp, frame_count)
+                    if bell_touch:
+                        # Initialize bell touches list if not exists
+                        if not hasattr(self, 'bell_touch_events'):
+                            self.bell_touch_events = []
+                        
+                        self.bell_touch_events.append(bell_touch)
+                        logger.info(f"🔔 Bell touch detected: {bell_touch.foot_used} foot, sequence #{bell_touch.sequence_number}")
+                        
+                        # Save debug frame for Bell Touch
+                        debug_frame = self._create_debug_frame(
+                            frame.copy(), ball_detection.position, foot_positions, pose_results, ball_detection
+                        )
+                        bell_debug_path = frames_dir / f"bell_touch_{len(self.bell_touch_events)}.jpg"
+                        cv2.imwrite(str(bell_debug_path), debug_frame)
+                        debug_frames.append(f"bell_touch_{len(self.bell_touch_events)}.jpg")
+                
                 # Phase 2b: Check for trajectory-based touches (catches missed touches)
                 if processed_frames % 5 == 0:  # Check every 5 frames for more sensitivity
                     trajectory_touch = self._infer_trajectory_touch(timestamp, foot_positions)
@@ -1129,6 +1374,16 @@ class VideoProcessor:
         # Calculate touch count range based on confidence and video quality
         touch_range = self._calculate_touch_range(total_touches, avg_confidence, quality_assessment)
         
+        # Process Bell Touches results
+        bell_touches = getattr(self, 'bell_touch_events', [])
+        total_bell_touches = len(bell_touches)
+        bell_touch_range = None
+        
+        if bell_touches:
+            # Calculate Bell Touches confidence
+            bell_confidence = sum(bt.confidence for bt in bell_touches) / len(bell_touches)
+            bell_touch_range = self._calculate_bell_touch_range(total_bell_touches, bell_confidence, quality_assessment)
+        
         results = {
             "total_ball_touches": total_touches,
             "touch_range": touch_range,
@@ -1150,7 +1405,15 @@ class VideoProcessor:
                 "brightness": round(quality_assessment.brightness, 1) if quality_assessment else 128,
                 "contrast": round(quality_assessment.contrast, 1) if quality_assessment else 50
             },
-            "detection_summary": self._get_detection_summary()
+            "detection_summary": self._get_detection_summary(),
+            # BELL TOUCHES RESULTS
+            "bell_touches": {
+                "total_bell_touches": total_bell_touches,
+                "bell_touch_range": bell_touch_range,
+                "bell_touch_events": [bt.to_dict() for bt in bell_touches],
+                "detected": total_bell_touches > 0,
+                "alternating_pattern": self._analyze_alternating_pattern(bell_touches) if bell_touches else None
+            }
         }
         
         model_info = "YOLO v2 + Traditional" if self.yolo_model else "Traditional Only"

@@ -26,10 +26,13 @@ app.mount("/static", StaticFiles(directory=str(LABELING_QUEUE)), name="static")
 # Global session state
 class Session:
     def __init__(self):
-        self.image_files = sorted([f.name for f in LABELING_QUEUE.glob("*.jpg")])
-        self.current_index = 0
+        all_files = sorted([f.name for f in LABELING_QUEUE.glob("*.jpg")])
         self.annotations = {}
         self.load_annotations()
+        # Only include unlabeled files
+        self.image_files = [f for f in all_files if f not in self.annotations]
+        self.current_index = 0
+        print(f"📊 Filtered to {len(self.image_files)} unlabeled frames out of {len(all_files)} total")
     
     def load_annotations(self):
         if ANNOTATIONS_FILE.exists():
@@ -40,6 +43,13 @@ class Session:
         with open(ANNOTATIONS_FILE, 'w') as f:
             json.dump(self.annotations, f, indent=2)
     
+    def find_next_unlabeled(self):
+        """No longer needed since we only load unlabeled files"""
+        if self.image_files:
+            logger.info(f"Starting with first unlabeled frame: {self.image_files[0]}")
+        else:
+            logger.info("No unlabeled frames remaining!")
+    
     def get_current_image(self):
         if self.current_index >= len(self.image_files):
             return None
@@ -48,7 +58,7 @@ class Session:
             'filename': filename,
             'index': self.current_index,
             'total': len(self.image_files),
-            'existing': self.annotations.get(filename, [])
+            'existing': []  # Always empty since these are unlabeled
         }
 
 session = Session()
@@ -277,8 +287,10 @@ if __name__ == "__main__":
     import uvicorn
     
     print(f"🚀 Starting labeling interface...")
-    print(f"📸 Found {len(session.image_files)} images")
+    print(f"📸 Found {len(session.image_files)} unlabeled images")
     print(f"✅ Already labeled: {len(session.annotations)}")
-    print(f"🌐 Open: http://localhost:8001")
+    print(f"📍 Starting at frame: {session.current_index + 1}")
+    print(f"⏳ To label: {len(session.image_files)} frames")
+    print(f"🌐 Open: http://localhost:8002")
     
-    uvicorn.run(app, host="0.0.0.0", port=8001, log_level="warning")
+    uvicorn.run(app, host="0.0.0.0", port=8002, log_level="warning")

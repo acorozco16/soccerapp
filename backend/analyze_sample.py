@@ -58,6 +58,21 @@ async def analyze_video(video_path: str, output_dir: str = None):
         else:
             print(f"📊 Total Ball Touches: {results['total_ball_touches']}")
         
+        # Show Bell Touches results if detected
+        if 'bell_touches' in results and results['bell_touches']['detected']:
+            bell_data = results['bell_touches']
+            print(f"\n🔔 BELL TOUCHES DETECTED:")
+            if bell_data['bell_touch_range']:
+                print(f"🔔 Bell Touches: {bell_data['bell_touch_range']['display']}")
+                print(f"📊 Detected Count: {bell_data['total_bell_touches']} (confidence: {bell_data['bell_touch_range']['confidence_level']})")
+                print(f"💡 {bell_data['bell_touch_range']['explanation']}")
+                
+                # Show pattern analysis
+                if bell_data['alternating_pattern']:
+                    pattern = bell_data['alternating_pattern']
+                    print(f"🔀 Pattern Quality: {pattern['pattern_quality']} (score: {pattern['alternating_score']})")
+                    print(f"👥 Foot Balance: {pattern['foot_distribution']['balance']} (L:{pattern['foot_distribution']['left_percentage']}% R:{pattern['foot_distribution']['right_percentage']}%)")
+        
         print(f"⏱️  Video Duration: {results['video_duration']:.1f} seconds")
         print(f"⚡ Touches per Minute: {results['touches_per_minute']}")
         print(f"🎯 Confidence Score: {results['confidence_score']}")

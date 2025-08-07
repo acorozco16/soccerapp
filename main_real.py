@@ -97,14 +97,14 @@ async def register():
 async def available_drills():
     return {
         "drills": [
-            {"id": "juggling", "name": "Juggling", "description": "Keep the ball up"},
-            {"id": "bell_touches", "name": "Bell Touches", "description": "Touch with inside of both feet"},
-            {"id": "inside_outside", "name": "Inside-Outside", "description": "Touch with inside then outside"},
-            {"id": "sole_rolls", "name": "Sole Rolls", "description": "Roll ball with sole of foot"},
-            {"id": "outside_foot_push", "name": "Outside Foot Push", "description": "Push ball with outside of foot"},
-            {"id": "v_cuts", "name": "V Cuts", "description": "Cut the ball in V motion"},
-            {"id": "croquetas", "name": "Croquetas", "description": "Pull ball across body"},
-            {"id": "triangles", "name": "Triangles", "description": "Move ball in triangle pattern"}
+            {"id": "juggling", "type": "juggling", "name": "Juggling", "description": "Keep the ball up"},
+            {"id": "bell_touches", "type": "bell_touches", "name": "Bell Touches", "description": "Touch with inside of both feet"},
+            {"id": "inside_outside", "type": "inside_outside", "name": "Inside-Outside", "description": "Touch with inside then outside"},
+            {"id": "sole_rolls", "type": "sole_rolls", "name": "Sole Rolls", "description": "Roll ball with sole of foot"},
+            {"id": "outside_foot_push", "type": "outside_foot_push", "name": "Outside Foot Push", "description": "Push ball with outside of foot"},
+            {"id": "v_cuts", "type": "v_cuts", "name": "V Cuts", "description": "Cut the ball in V motion"},
+            {"id": "croquetas", "type": "croquetas", "name": "Croquetas", "description": "Pull ball across body"},
+            {"id": "triangles", "type": "triangles", "name": "Triangles", "description": "Move ball in triangle pattern"}
         ]
     }
 
