@@ -7,6 +7,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "scheme": "soccertrainingapp",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -15,8 +16,12 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.soccertraining.app",
+      "buildNumber": "39",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "This app uses the camera to record soccer training videos for skill analysis and improvement.",
+        "NSMicrophoneUsageDescription": "This app may access the microphone to record audio with training videos.",
+        "NSPhotoLibraryUsageDescription": "This app allows you to select videos from your photo library for soccer skill analysis."
       }
     },
     "android": {

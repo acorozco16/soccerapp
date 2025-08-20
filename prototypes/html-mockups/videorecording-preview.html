@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VideoRecording Preview</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: white;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: #000;
+            min-height: 100vh;
+            position: relative;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            padding-top: 50px;
+            background: rgba(0,0,0,0.7);
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+        }
+        .back-button {
+            color: white;
+            padding: 5px;
+        }
+        .title {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+            flex: 1;
+            text-align: center;
+            margin: 0 10px;
+        }
+        .flip-button {
+            color: white;
+            padding: 5px;
+            margin-left: 10px;
+        }
+        .camera-area {
+            height: 500px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            margin-top: 90px;
+        }
+        .instructions {
+            background: rgba(0,0,0,0.6);
+            margin: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            position: absolute;
+            top: 120px;
+            left: 0;
+            right: 0;
+        }
+        .instructions-text {
+            color: white;
+            font-size: 16px;
+            text-align: center;
+        }
+        .controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.8);
+            padding-bottom: 40px;
+        }
+        .controls-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 0;
+        }
+        .record-button {
+            width: 80px;
+            height: 80px;
+            border-radius: 40px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 30px;
+            cursor: pointer;
+        }
+        .record-button-inner {
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            background: #ff4444;
+        }
+        .timer-text {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            position: absolute;
+            right: 20px;
+        }
+        .tips-container {
+            background: rgba(255,255,255,0.1);
+            margin: 20px;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        .tips-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .tips-text {
+            color: #ccc;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="back-button">←</div>
+            <div class="title">Juggling</div>
+            <div>
+                <span class="flip-button">🔄</span>
+                <span class="flip-button">📷</span>
+            </div>
+        </div>
+
+        <div class="camera-area">
+            Camera View
+        </div>
+
+        <div class="instructions">
+            <div class="instructions-text">
+                Position yourself in frame and press record when ready
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="controls-row">
+                <div style="flex: 1;"></div>
+                
+                <div class="record-button">
+                    <div class="record-button-inner"></div>
+                </div>
+
+                <div style="flex: 1; position: relative;">
+                    <div class="timer-text">0:00</div>
+                </div>
+            </div>
+
+            <div class="tips-container">
+                <div class="tips-title">Recording Tips:</div>
+                <div class="tips-text">• Keep the entire drill area in frame</div>
+                <div class="tips-text">• Record for at least 10 seconds</div>
+                <div class="tips-text">• Ensure good lighting</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

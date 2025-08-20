@@ -95,4 +95,11 @@ training_data/experiments/
 
 # Labeling logs
 labeling.log
-nohup.out
+nohup.out# Build artifacts and temporary files
+builds/
+prototypes/
+development/experiments/
+*.ips
+*.ipa
+*.crash
+.DS_Store

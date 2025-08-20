@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soccer App Results Preview</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #F8F9FA;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #001F3F;
+        }
+        .icon {
+            width: 24px;
+            height: 24px;
+            background: #6C757D;
+            border-radius: 4px;
+        }
+        .overall-container {
+            background: white;
+            padding: 30px;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .drill-name {
+            font-size: 18px;
+            color: #6C757D;
+            margin-bottom: 15px;
+        }
+        .grade-container {
+            margin-bottom: 10px;
+        }
+        .grade-text {
+            font-size: 48px;
+            font-weight: bold;
+            color: #663399;
+        }
+        .score-text {
+            font-size: 24px;
+            color: #6C757D;
+            font-weight: 500;
+        }
+        .completion-text {
+            font-size: 14px;
+            color: #999;
+        }
+        .tab-container {
+            display: flex;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        .tab.active {
+            border-bottom-color: #663399;
+            color: #663399;
+            font-weight: 600;
+        }
+        .section {
+            padding: 20px;
+        }
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #001F3F;
+            margin-bottom: 15px;
+        }
+        .scores-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .score-card {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .score-title {
+            font-size: 14px;
+            color: #6C757D;
+            margin-bottom: 10px;
+        }
+        .score-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .insight-card {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .insight-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #001F3F;
+            margin-bottom: 5px;
+        }
+        .insight-text {
+            font-size: 14px;
+            color: #6C757D;
+            line-height: 20px;
+        }
+        .old-version {
+            border: 3px solid #ff4444;
+            position: relative;
+        }
+        .old-version::before {
+            content: "OLD VERSION ❌";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff4444;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .new-version {
+            border: 3px solid #44ff44;
+            position: relative;
+        }
+        .new-version::before {
+            content: "NEW VERSION ✅";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #44ff44;
+            color: black;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .comparison-container {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #001F3F;
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Soccer App Results Screen Comparison</h1>
+    
+    <div class="comparison-container">
+        <!-- OLD VERSION -->
+        <div class="container old-version">
+            <div class="header">
+                <div class="icon"></div>
+                <div class="header-title">Analysis Results</div>
+                <div class="icon"></div>
+            </div>
+            
+            <div class="overall-container">
+                <div class="drill-name">Juggling</div>
+                <div class="grade-container">
+                    <div class="grade-text">D</div>
+                    <div class="score-text">0/100</div>
+                </div>
+                <div class="completion-text">
+                    Analysis completed • 8/13/2025
+                </div>
+            </div>
+            
+            <div class="tab-container">
+                <div class="tab active">Overview</div>
+                <div class="tab">Detailed</div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">Key Metrics</div>
+                <div class="scores-grid">
+                    <div class="score-card">
+                        <div class="score-title">Technique</div>
+                        <div class="score-value" style="color: #2196F3">0</div>
+                        <div style="font-size: 16px; color: #999">/ 100</div>
+                    </div>
+                    <div class="score-card">
+                        <div class="score-title">Consistency</div>
+                        <div class="score-value" style="color: #FF9800">0</div>
+                        <div style="font-size: 16px; color: #999">/ 100</div>
+                    </div>
+                    <div class="score-card">
+                        <div class="score-title">Speed</div>
+                        <div class="score-value" style="color: #9C27B0">0</div>
+                        <div style="font-size: 16px; color: #999">/ 100</div>
+                    </div>
+                    <div class="score-card">
+                        <div class="score-title">Accuracy</div>
+                        <div class="score-value" style="color: #663399">0</div>
+                        <div style="font-size: 16px; color: #999">/ 100</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW VERSION -->
+        <div class="container new-version">
+            <div class="header">
+                <div class="icon"></div>
+                <div class="header-title">Analysis Results</div>
+                <div class="icon"></div>
+            </div>
+            
+            <div class="overall-container">
+                <div class="drill-name">Juggling</div>
+                <div class="grade-container">
+                    <div class="grade-text">3</div>
+                    <div class="score-text">touches</div>
+                </div>
+                <div class="completion-text">
+                    16.3 touches/min • 11s duration
+                </div>
+            </div>
+            
+            <div class="tab-container">
+                <div class="tab active">Overview</div>
+                <div class="tab">Detailed</div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">Session Stats</div>
+                <div class="scores-grid">
+                    <div class="score-card">
+                        <div class="score-title">Total Touches</div>
+                        <div class="score-value" style="color: #663399">3</div>
+                    </div>
+                    <div class="score-card">
+                        <div class="score-title">Duration</div>
+                        <div class="score-value" style="color: #FF9800">11s</div>
+                    </div>
+                    <div class="score-card">
+                        <div class="score-title">Touches/Min</div>
+                        <div class="score-value" style="color: #9C27B0">16.3</div>
+                    </div>
+                    <div class="score-card">
+                        <div class="score-title">Avg Interval</div>
+                        <div class="score-value" style="color: #2196F3">3.7s</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">Quick Insights</div>
+                <div class="insight-card">
+                    <div class="insight-title">Strengths</div>
+                    <div class="insight-text">
+                        3 touches in 11.1 seconds = 16.3 touches/minute
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">Areas to Improve</div>
+                    <div class="insight-text">
+                        Keep practicing to increase your touches per minute
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

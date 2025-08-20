@@ -1,0 +1,69 @@
+# STABLE MEDIAPIPE ENVIRONMENT - PRODUCTION LOCKED VERSIONS
+# These versions are tested to work together reliably
+# Last updated: 2025-01-14 for soccer training app
+
+# Core MediaPipe and Computer Vision
+mediapipe==0.10.7
+opencv-python==4.8.1.78
+numpy==1.24.3
+
+# Critical dependency - PROTOBUF VERSION CONFLICT FIX
+# Protobuf 4.x causes MediaPipe initialization failures
+protobuf==3.20.3
+
+# Image and video processing
+Pillow==10.0.1
+imageio==2.31.5
+imageio-ffmpeg==0.4.9
+
+# FastAPI and web framework
+fastapi==0.104.1
+uvicorn==0.24.0
+python-multipart==0.0.6
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
+# Database and storage
+supabase==2.0.2
+postgrest==0.10.8
+gotrue==1.0.4
+realtime==1.0.0
+storage3==0.7.4
+
+# AI and ML dependencies
+torch==2.1.0
+torchvision==0.16.0
+ultralytics==8.0.196  # YOLO v8
+
+# Tracking and analysis
+filterpy==1.4.5
+scipy==1.11.4
+
+# File handling and utilities
+requests==2.31.0
+aiofiles==23.2.1
+python-dotenv==1.0.0
+
+# Logging and monitoring
+structlog==23.2.0
+psutil==5.9.6
+
+# Development and testing (optional)
+pytest==7.4.3
+pytest-asyncio==0.21.1
+
+# IMPORTANT NOTES:
+# 1. DO NOT upgrade protobuf beyond 3.20.x - causes MediaPipe failures
+# 2. OpenCV 4.8.x is the last stable version with MediaPipe 0.10.7
+# 3. MediaPipe 0.10.7 is the most stable release for production
+# 4. NumPy 1.24.x has the best compatibility matrix
+# 5. Pin torch version to avoid breaking changes
+
+# System requirements (install via apt):
+# sudo apt-get install -y libglib2.0-0 libgstreamer1.0-0 libgtk-3-0 libgl1-mesa-glx libglib2.0-dev
+
+# Installation command:
+# pip install -r stable_requirements.txt --no-deps --force-reinstall
+
+# Verification command:
+# python -c "import mediapipe as mp; pose = mp.solutions.pose.Pose(); print('✅ MediaPipe OK'); pose.close()"
