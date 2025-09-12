@@ -1,0 +1,26 @@
+{
+    "api_keys": {
+      "youtube": ["AIzaSyA9CQD1prebisBVAsj90ncxI3ZVJ2uDYYE"],
+      "instagram": null,
+      "unsplash": null,
+      "pexels": null
+    },
+    "email": {
+      "enabled": false
+    },
+    "training": {
+      "target_images_initial": 1000,
+      "target_images_weekly": 500,
+      "min_new_data_for_training": 100,
+      "min_accuracy_improvement": 5.0,
+      "target_accuracy": 90.0,
+      "max_training_hours": 4,
+      "training_stages": [100, 500, 1000],
+      "max_parallel_downloads": 3,
+      "max_disk_usage_gb": 20,
+      "cleanup_after_days": 30
+    },
+    "cloud_storage": {
+      "enabled": false
+    }
+  }

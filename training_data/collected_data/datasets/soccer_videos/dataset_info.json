@@ -1,0 +1,7 @@
+{
+  "name": "Soccer Video Clips",
+  "description": "Curated soccer training video clips",
+  "format": "MP4",
+  "resolution": "720p",
+  "note": "Placeholder implementation - add actual video sources"
+}

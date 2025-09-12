@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyzing Performance - Soccer Training App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #F8F9FA;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: #F8F9FA;
+        }
+        
+        /* Header */
+        .header {
+            background: white;
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .cancel-icon {
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #001F3F;
+        }
+        
+        .placeholder {
+            width: 34px;
+        }
+        
+        /* Content */
+        .content {
+            padding: 20px;
+        }
+        
+        .drill-info {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .drill-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #001F3F;
+            margin-bottom: 5px;
+        }
+        
+        .drill-subtitle {
+            font-size: 16px;
+            color: #6C757D;
+        }
+        
+        /* Progress Container */
+        .progress-container {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .progress-ring {
+            margin-bottom: 20px;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #663399;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .progress-percentage {
+            font-size: 32px;
+            font-weight: bold;
+            color: #663399;
+            margin-bottom: 10px;
+        }
+        
+        /* NEW: Rep Counter */
+        .rep-counter {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .rep-counter-icon {
+            font-size: 28px;
+        }
+        
+        .rep-counter-text {
+            font-size: 18px;
+            color: #001F3F;
+            font-weight: 600;
+        }
+        
+        .rep-counter-number {
+            font-size: 28px;
+            color: #663399;
+            font-weight: bold;
+        }
+        
+        /* Progress Bar */
+        .progress-bar-container {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        .progress-bar-background {
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background-color: #663399;
+            border-radius: 4px;
+            width: 50%;
+            transition: width 0.5s ease;
+        }
+        
+        .step-text {
+            font-size: 16px;
+            color: #6C757D;
+            text-align: center;
+        }
+        
+        /* Info Cards */
+        .info-container {
+            margin-top: 30px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .info-icon {
+            font-size: 24px;
+            color: #663399;
+            margin-right: 15px;
+        }
+        
+        .info-content {
+            flex: 1;
+        }
+        
+        .info-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #001F3F;
+            margin-bottom: 5px;
+        }
+        
+        .info-text {
+            font-size: 14px;
+            color: #6C757D;
+            line-height: 1.5;
+        }
+        
+        /* Icons */
+        .icon {
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="cancel-icon">
+                <span class="icon">✕</span>
+            </div>
+            <div class="header-title">Analyzing Performance</div>
+            <div class="placeholder"></div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Drill Info -->
+            <div class="drill-info">
+                <div class="drill-name">Juggling</div>
+                <div class="drill-subtitle">Video Analysis in Progress</div>
+            </div>
+
+            <!-- Progress Container -->
+            <div class="progress-container">
+                <div class="progress-ring">
+                    <div class="spinner"></div>
+                </div>
+                
+                <div class="progress-percentage">50%</div>
+                
+                <!-- NEW: Real-time Rep Counter -->
+                <div class="rep-counter">
+                    <span class="rep-counter-icon">⚽</span>
+                    <span class="rep-counter-text">Reps detected:</span>
+                    <span class="rep-counter-number">6</span>
+                </div>
+                
+                <div class="progress-bar-container">
+                    <div class="progress-bar-background">
+                        <div class="progress-bar-fill"></div>
+                    </div>
+                </div>
+                
+                <!-- Drill-specific message -->
+                <div class="step-text">Detecting touches...</div>
+            </div>
+
+            <!-- Info Cards -->
+            <div class="info-container">
+                <div class="info-card">
+                    <span class="info-icon">📊</span>
+                    <div class="info-content">
+                        <div class="info-title">Counting Reps</div>
+                        <div class="info-text">
+                            Our system is detecting and counting your repetitions in real-time
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <span class="info-icon">⏱️</span>
+                    <div class="info-content">
+                        <div class="info-title">Processing Time</div>
+                        <div class="info-text">
+                            Analysis typically takes 1-3 minutes depending on video length
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <span class="info-icon">📈</span>
+                    <div class="info-content">
+                        <div class="info-title">Track Progress</div>
+                        <div class="info-text">
+                            Your results will be saved to track improvement over time
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Example of drill-specific messages
+        const drillMessages = {
+            'juggling': [
+                'Processing video...',
+                'Detecting touches...',
+                'Counting total touches...'
+            ],
+            'v_cuts': [
+                'Processing video...',
+                'Detecting cuts...',
+                'Counting repetitions...'
+            ],
+            'sole_rolls': [
+                'Processing video...',
+                'Detecting rolls...',
+                'Counting repetitions...'
+            ],
+            'inside_outside': [
+                'Processing video...',
+                'Detecting foot touches...',
+                'Counting alternations...'
+            ],
+            'croquetas': [
+                'Processing video...',
+                'Detecting movements...',
+                'Counting repetitions...'
+            ],
+            'bell_touches': [
+                'Processing video...',
+                'Detecting touches...',
+                'Counting total touches...'
+            ],
+            'triangles': [
+                'Processing video...',
+                'Detecting movements...',
+                'Counting triangle completions...'
+            ],
+            'outside_foot_push': [
+                'Processing video...',
+                'Detecting pushes...',
+                'Counting repetitions...'
+            ]
+        };
+
+        // Simulate progress updates
+        let progress = 0;
+        let reps = 0;
+        
+        setInterval(() => {
+            progress += 10;
+            if (progress > 100) progress = 100;
+            
+            // Update progress bar
+            document.querySelector('.progress-bar-fill').style.width = progress + '%';
+            document.querySelector('.progress-percentage').textContent = progress + '%';
+            
+            // Update message based on progress
+            const messageIndex = Math.floor((progress / 100) * 2.99);
+            const messages = drillMessages['juggling'];
+            document.querySelector('.step-text').textContent = messages[messageIndex];
+            
+            // Simulate rep counting
+            if (progress > 30 && progress < 90) {
+                if (Math.random() > 0.7) {
+                    reps++;
+                    document.querySelector('.rep-counter-number').textContent = reps;
+                }
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

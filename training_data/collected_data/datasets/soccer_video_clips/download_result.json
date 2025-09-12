@@ -1,0 +1,7 @@
+{
+  "dataset": "soccer_videos",
+  "started_at": "2025-07-25T13:08:52.756295",
+  "videos_downloaded": 0,
+  "completed_at": "2025-07-25T13:08:52.757423",
+  "note": "Placeholder implementation - requires actual video sources"
+}

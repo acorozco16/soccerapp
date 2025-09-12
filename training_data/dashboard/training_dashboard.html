@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soccer AI Training Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            color: #1e3c72;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #28a745;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card h3 {
+            color: #1e3c72;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .metric:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            font-weight: 500;
+            color: #666;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            transition: width 0.3s ease;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-running { background: #d4edda; color: #155724; }
+        .status-completed { background: #cce5ff; color: #004085; }
+        .status-failed { background: #f8d7da; color: #721c24; }
+        .status-idle { background: #e2e3e5; color: #495057; }
+
+        .chart-container {
+            grid-column: 1 / -1;
+            height: 400px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: #1e3c72;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background: #2a5298;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .log-viewer {
+            grid-column: 1 / -1;
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 1rem;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #1e3c72;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0.5rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #dee2e6;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -1.85rem;
+            top: 0.5rem;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #1e3c72;
+        }
+
+        .timeline-item.completed::before {
+            background: #28a745;
+        }
+
+        .timeline-item.failed::before {
+            background: #dc3545;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .grid {
+                gap: 1rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>
+            ⚽ Soccer AI Training Dashboard
+            <div class="status-indicator" id="statusIndicator"></div>
+        </h1>
+    </div>
+
+    <div class="container">
+        <!-- Alerts -->
+        <div id="alerts"></div>
+
+        <!-- Control Panel -->
+        <div class="controls">
+            <button class="btn" id="collectDataBtn">
+                📥 Collect Data
+            </button>
+            <button class="btn" id="trainModelBtn">
+                🧠 Train Model
+            </button>
+            <button class="btn" id="deployModelBtn">
+                🚀 Deploy Model
+            </button>
+            <button class="btn btn-secondary" id="refreshBtn">
+                🔄 Refresh
+            </button>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="grid">
+            <!-- System Health -->
+            <div class="card">
+                <h3>🏥 System Health</h3>
+                <div class="metric">
+                    <span class="metric-label">Status</span>
+                    <span class="metric-value" id="systemStatus">Loading...</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">CPU Usage</span>
+                    <span class="metric-value" id="cpuUsage">0%</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Memory Usage</span>
+                    <span class="metric-value" id="memoryUsage">0%</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Disk Usage</span>
+                    <span class="metric-value" id="diskUsage">0%</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Active Tasks</span>
+                    <span class="metric-value" id="activeTasks">0</span>
+                </div>
+            </div>
+
+            <!-- Data Collection Status -->
+            <div class="card">
+                <h3>📥 Data Collection</h3>
+                <div class="metric">
+                    <span class="metric-label">Overall Progress</span>
+                    <span class="metric-value" id="collectionProgress">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="collectionProgressBar" style="width: 0%"></div>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Items Collected</span>
+                    <span class="metric-value" id="itemsCollected">0</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Active Sources</span>
+                    <span class="metric-value" id="activeSources">0</span>
+                </div>
+                <div id="sourceStatus"></div>
+            </div>
+
+            <!-- Training Status -->
+            <div class="card">
+                <h3>🧠 Model Training</h3>
+                <div class="metric">
+                    <span class="metric-label">Status</span>
+                    <span class="metric-value" id="trainingStatus">Idle</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Current Stage</span>
+                    <span class="metric-value" id="currentStage">-</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Progress</span>
+                    <span class="metric-value" id="trainingProgress">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="trainingProgressBar" style="width: 0%"></div>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Current Accuracy</span>
+                    <span class="metric-value" id="currentAccuracy">0%</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Best Accuracy</span>
+                    <span class="metric-value" id="bestAccuracy">0%</span>
+                </div>
+            </div>
+
+            <!-- Recent Activities -->
+            <div class="card">
+                <h3>📋 Recent Activities</h3>
+                <div class="timeline" id="recentActivities">
+                    <!-- Timeline items will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Model Performance Chart -->
+            <div class="card chart-container">
+                <h3>📊 Model Performance History</h3>
+                <canvas id="performanceChart" width="800" height="300"></canvas>
+            </div>
+
+            <!-- Log Viewer -->
+            <div class="card">
+                <h3>📝 System Logs</h3>
+                <div class="log-viewer" id="logViewer">
+                    Loading logs...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="progress_charts.js"></script>
+    <script>
+        class TrainingDashboard {
+            constructor() {
+                this.isConnected = false;
+                this.updateInterval = null;
+                this.logLines = [];
+                this.maxLogLines = 100;
+                
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.startAutoRefresh();
+                this.updateStatus();
+            }
+
+            setupEventListeners() {
+                document.getElementById('collectDataBtn').addEventListener('click', () => {
+                    this.triggerDataCollection();
+                });
+
+                document.getElementById('trainModelBtn').addEventListener('click', () => {
+                    this.triggerTraining();
+                });
+
+                document.getElementById('deployModelBtn').addEventListener('click', () => {
+                    this.triggerDeployment();
+                });
+
+                document.getElementById('refreshBtn').addEventListener('click', () => {
+                    this.updateStatus();
+                });
+            }
+
+            startAutoRefresh() {
+                this.updateInterval = setInterval(() => {
+                    this.updateStatus();
+                }, 5000); // Update every 5 seconds
+            }
+
+            async updateStatus() {
+                try {
+                    const response = await fetch('/training-api/status');
+                    if (!response.ok) throw new Error('Failed to fetch status');
+                    
+                    const data = await response.json();
+                    this.updateUI(data);
+                    this.setConnectionStatus(true);
+                } catch (error) {
+                    console.error('Failed to update status:', error);
+                    this.setConnectionStatus(false);
+                    this.showAlert('danger', 'Connection lost to training API');
+                }
+            }
+
+            updateUI(data) {
+                // Update system health
+                const system = data.system || {};
+                document.getElementById('systemStatus').textContent = system.health_status || 'Unknown';
+                document.getElementById('cpuUsage').textContent = `${Math.round(system.cpu_usage || 0)}%`;
+                document.getElementById('memoryUsage').textContent = `${Math.round(system.memory_usage || 0)}%`;
+                document.getElementById('diskUsage').textContent = `${Math.round(system.disk_usage || 0)}%`;
+                document.getElementById('activeTasks').textContent = system.active_processes || 0;
+
+                // Update data collection
+                const collection = data.collection || {};
+                const collectionProgress = Math.round((collection.overall_progress || 0) * 100);
+                document.getElementById('collectionProgress').textContent = `${collectionProgress}%`;
+                document.getElementById('collectionProgressBar').style.width = `${collectionProgress}%`;
+                document.getElementById('itemsCollected').textContent = collection.total_items_collected || 0;
+                document.getElementById('activeSources').textContent = collection.active_sources || 0;
+
+                // Update training status
+                const training = data.training || {};
+                const trainingProgress = Math.round((training.progress || 0) * 100);
+                document.getElementById('trainingStatus').textContent = training.status || 'Idle';
+                document.getElementById('currentStage').textContent = training.current_stage || '-';
+                document.getElementById('trainingProgress').textContent = `${trainingProgress}%`;
+                document.getElementById('trainingProgressBar').style.width = `${trainingProgress}%`;
+                document.getElementById('currentAccuracy').textContent = `${Math.round((training.current_accuracy || 0) * 100)}%`;
+                document.getElementById('bestAccuracy').textContent = `${Math.round((training.best_accuracy || 0) * 100)}%`;
+
+                // Update alerts
+                this.updateAlerts(data.alerts || []);
+
+                // Update recent activities
+                this.updateRecentActivities(data.recent_activities || []);
+
+                // Update performance chart
+                if (window.TrainingCharts) {
+                    window.TrainingCharts.updatePerformanceChart(data.performance_history || []);
+                }
+            }
+
+            updateAlerts(alerts) {
+                const alertsContainer = document.getElementById('alerts');
+                alertsContainer.innerHTML = '';
+
+                alerts.forEach(alert => {
+                    const alertElement = document.createElement('div');
+                    alertElement.className = `alert ${alert.type === 'critical' ? 'alert-danger' : 'alert-warning'}`;
+                    alertElement.innerHTML = `
+                        <strong>${alert.component}:</strong> ${alert.message}
+                    `;
+                    alertsContainer.appendChild(alertElement);
+                });
+            }
+
+            updateRecentActivities(activities) {
+                const container = document.getElementById('recentActivities');
+                container.innerHTML = '';
+
+                activities.slice(0, 10).forEach(activity => {
+                    const item = document.createElement('div');
+                    item.className = `timeline-item ${activity.status}`;
+                    item.innerHTML = `
+                        <strong>${activity.component}</strong>: ${activity.message}
+                        <br><small>${new Date(activity.timestamp).toLocaleString()}</small>
+                    `;
+                    container.appendChild(item);
+                });
+            }
+
+            setConnectionStatus(connected) {
+                this.isConnected = connected;
+                const indicator = document.getElementById('statusIndicator');
+                indicator.style.background = connected ? '#28a745' : '#dc3545';
+            }
+
+            showAlert(type, message) {
+                const alertsContainer = document.getElementById('alerts');
+                const alert = document.createElement('div');
+                alert.className = `alert alert-${type}`;
+                alert.textContent = message;
+                alertsContainer.appendChild(alert);
+
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    if (alert.parentNode) {
+                        alert.parentNode.removeChild(alert);
+                    }
+                }, 5000);
+            }
+
+            async triggerDataCollection() {
+                const btn = document.getElementById('collectDataBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<div class="spinner"></div> Collecting...';
+
+                try {
+                    const response = await fetch('/training-api/trigger-collection', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ target_images: 1000 })
+                    });
+
+                    if (!response.ok) throw new Error('Failed to trigger collection');
+                    
+                    this.showAlert('success', 'Data collection started successfully');
+                } catch (error) {
+                    this.showAlert('danger', `Failed to start data collection: ${error.message}`);
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = '📥 Collect Data';
+                }
+            }
+
+            async triggerTraining() {
+                const btn = document.getElementById('trainModelBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<div class="spinner"></div> Training...';
+
+                try {
+                    const response = await fetch('/training-api/trigger-training', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ auto_deploy: false })
+                    });
+
+                    if (!response.ok) throw new Error('Failed to trigger training');
+                    
+                    this.showAlert('success', 'Model training started successfully');
+                } catch (error) {
+                    this.showAlert('danger', `Failed to start training: ${error.message}`);
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = '🧠 Train Model';
+                }
+            }
+
+            async triggerDeployment() {
+                if (!confirm('Are you sure you want to deploy the latest model?')) return;
+
+                const btn = document.getElementById('deployModelBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<div class="spinner"></div> Deploying...';
+
+                try {
+                    const response = await fetch('/training-api/deploy-model', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ test_first: true })
+                    });
+
+                    if (!response.ok) throw new Error('Failed to trigger deployment');
+                    
+                    this.showAlert('success', 'Model deployment started successfully');
+                } catch (error) {
+                    this.showAlert('danger', `Failed to start deployment: ${error.message}`);
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = '🚀 Deploy Model';
+                }
+            }
+        }
+
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            window.dashboard = new TrainingDashboard();
+        });
+    </script>
+</body>
+</html>

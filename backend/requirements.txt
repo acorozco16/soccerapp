@@ -1,0 +1,16 @@
+# Core dependencies
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+aiofiles==23.2.1
+sqlalchemy==2.0.25
+python-dotenv==1.0.0
+pydantic==2.5.3
+supabase==1.0.3
+psutil==5.9.7
+requests==2.31.0
+email-validator==2.1.0
+
+# Computer Vision (Python 3.13 compatible)
+numpy>=1.26.0
+Pillow>=10.0.0

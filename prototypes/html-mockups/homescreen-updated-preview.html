@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HomeScreen Updated Preview</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #F8F9FA;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: #F8F9FA;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+        }
+        .logout-icon {
+            color: #6C757D;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .subtitle {
+            font-size: 20px;
+            font-weight: 600;
+            color: #004996;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .description {
+            font-size: 16px;
+            color: #6C757D;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .drills-section {
+            margin-bottom: 30px;
+        }
+        .section-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .drills-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .drill-card {
+            background: #FFFFFF;
+            border-radius: 12px;
+            padding: 15px;
+            width: 48%;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .drill-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .drill-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-left: 8px;
+            flex: 1;
+        }
+        .drill-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .best-label {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .progress-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: #FCBF00;
+        }
+        .session-text {
+            font-size: 14px;
+            color: #6C757D;
+            margin-bottom: 10px;
+        }
+        .progress-dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+        }
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 4px;
+        }
+        .progress-dot.blue {
+            background-color: #004996;
+        }
+        .progress-dot.gold {
+            background-color: #FCBF00;
+        }
+        .start-button {
+            background-color: #004996;
+            padding: 15px;
+            border-radius: 25px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        .start-button-text {
+            color: #FFFFFF;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .soccer-icon {
+            color: #004996;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">Welcome Andrew! ⚽</div>
+            <div class="logout-icon">⚙️</div>
+        </div>
+
+        <div class="subtitle">
+            Ready to start your soccer training journey?
+        </div>
+        
+        <div class="description">
+            Select a drill below to begin tracking your touches
+        </div>
+
+        <div class="drills-section">
+            <div class="section-title">Your Drills</div>
+            
+            <div class="drills-grid">
+                <div class="drill-card">
+                    <div class="drill-header">
+                        <div class="soccer-icon">⚽</div>
+                        <div class="drill-name">Juggling</div>
+                    </div>
+                    
+                    <div class="drill-stats">
+                        <div class="best-label">Best: 0</div>
+                        <div class="progress-text">+0%</div>
+                    </div>
+                    
+                    <div class="session-text">Never</div>
+                    
+                    <div class="progress-dots">
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot gold"></div>
+                    </div>
+                </div>
+
+                <div class="drill-card">
+                    <div class="drill-header">
+                        <div class="soccer-icon">⚽</div>
+                        <div class="drill-name">Bell Touches</div>
+                    </div>
+                    
+                    <div class="drill-stats">
+                        <div class="best-label">Best: 0</div>
+                        <div class="progress-text">+0%</div>
+                    </div>
+                    
+                    <div class="session-text">Never</div>
+                    
+                    <div class="progress-dots">
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot gold"></div>
+                    </div>
+                </div>
+
+                <div class="drill-card">
+                    <div class="drill-header">
+                        <div class="soccer-icon">⚽</div>
+                        <div class="drill-name">Inside-Outside</div>
+                    </div>
+                    
+                    <div class="drill-stats">
+                        <div class="best-label">Best: 0</div>
+                        <div class="progress-text">+0%</div>
+                    </div>
+                    
+                    <div class="session-text">Never</div>
+                    
+                    <div class="progress-dots">
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot gold"></div>
+                    </div>
+                </div>
+
+                <div class="drill-card">
+                    <div class="drill-header">
+                        <div class="soccer-icon">⚽</div>
+                        <div class="drill-name">Sole Rolls</div>
+                    </div>
+                    
+                    <div class="drill-stats">
+                        <div class="best-label">Best: 0</div>
+                        <div class="progress-text">+0%</div>
+                    </div>
+                    
+                    <div class="session-text">Never</div>
+                    
+                    <div class="progress-dots">
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot gold"></div>
+                    </div>
+                </div>
+
+                <div class="drill-card">
+                    <div class="drill-header">
+                        <div class="soccer-icon">⚽</div>
+                        <div class="drill-name">Outside Foot Push</div>
+                    </div>
+                    
+                    <div class="drill-stats">
+                        <div class="best-label">Best: 0</div>
+                        <div class="progress-text">+0%</div>
+                    </div>
+                    
+                    <div class="session-text">Never</div>
+                    
+                    <div class="progress-dots">
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot gold"></div>
+                    </div>
+                </div>
+
+                <div class="drill-card">
+                    <div class="drill-header">
+                        <div class="soccer-icon">⚽</div>
+                        <div class="drill-name">V Cuts</div>
+                    </div>
+                    
+                    <div class="drill-stats">
+                        <div class="best-label">Best: 0</div>
+                        <div class="progress-text">+0%</div>
+                    </div>
+                    
+                    <div class="session-text">Never</div>
+                    
+                    <div class="progress-dots">
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot gold"></div>
+                    </div>
+                </div>
+
+                <div class="drill-card">
+                    <div class="drill-header">
+                        <div class="soccer-icon">⚽</div>
+                        <div class="drill-name">Croquetas</div>
+                    </div>
+                    
+                    <div class="drill-stats">
+                        <div class="best-label">Best: 0</div>
+                        <div class="progress-text">+0%</div>
+                    </div>
+                    
+                    <div class="session-text">Never</div>
+                    
+                    <div class="progress-dots">
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot gold"></div>
+                    </div>
+                </div>
+
+                <div class="drill-card">
+                    <div class="drill-header">
+                        <div class="soccer-icon">⚽</div>
+                        <div class="drill-name">Triangles</div>
+                    </div>
+                    
+                    <div class="drill-stats">
+                        <div class="best-label">Best: 0</div>
+                        <div class="progress-text">+0%</div>
+                    </div>
+                    
+                    <div class="session-text">Never</div>
+                    
+                    <div class="progress-dots">
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot blue"></div>
+                        <div class="progress-dot gold"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="start-button">
+            <div class="start-button-text">Start Practice</div>
+        </div>
+    </div>
+</body>
+</html>

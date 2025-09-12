@@ -1,0 +1,6 @@
+names:
+  0: ball
+nc: 1
+path: /Users/andreworozco/soccer app/training_data/datasets/real_ball_dataset_augmented
+train: images/train
+val: images/val

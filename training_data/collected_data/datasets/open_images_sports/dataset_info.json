@@ -1,0 +1,10 @@
+{
+  "name": "Open Images Sports Sample",
+  "description": "Placeholder for Open Images sports data",
+  "classes": [
+    "Ball",
+    "Football",
+    "Person"
+  ],
+  "note": "This is a placeholder. Implement actual Open Images download logic."
+}

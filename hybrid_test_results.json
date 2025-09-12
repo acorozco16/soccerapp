@@ -1,0 +1,56 @@
+{
+  "total_ball_touches": 3,
+  "video_duration": 13.92,
+  "touches_per_minute": 12.9,
+  "confidence_score": 0.5,
+  "processing_time": 45.1,
+  "touch_events": [
+    {
+      "timestamp": 3.05,
+      "frame": 183,
+      "confidence": 0.5,
+      "position": [
+        652,
+        180
+      ],
+      "detection_method": "traditional"
+    },
+    {
+      "timestamp": 4.2,
+      "frame": 252,
+      "confidence": 0.5,
+      "position": [
+        802,
+        264
+      ],
+      "detection_method": "traditional"
+    },
+    {
+      "timestamp": 7.7,
+      "frame": 462,
+      "confidence": 0.5,
+      "position": [
+        416,
+        388
+      ],
+      "detection_method": "traditional"
+    }
+  ],
+  "metadata": {
+    "duration": 13.92,
+    "fps": 60.0,
+    "size": [
+      1280,
+      720
+    ],
+    "format": ".mp4"
+  },
+  "model_used": "YOLO + Traditional Hybrid",
+  "detection_summary": {
+    "yolo_available": true,
+    "total_detections": 15,
+    "detection_methods": {
+      "traditional": 15
+    }
+  }
+}

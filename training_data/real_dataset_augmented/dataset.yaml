@@ -1,0 +1,8 @@
+path: /Users/andreworozco/soccer app/training_data/real_dataset_augmented
+train: images
+val: images  # Use same images for validation in small dataset
+
+names:
+  0: ball
+
+nc: 1

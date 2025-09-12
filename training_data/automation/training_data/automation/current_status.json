@@ -1,0 +1,18 @@
+{
+  "collection": {},
+  "training": {
+    "session_id": "progressive_20250725_141613",
+    "status": "failed",
+    "current_stage": "",
+    "progress": 0.0,
+    "epoch": 0,
+    "total_epochs": 0,
+    "current_accuracy": 0.0,
+    "best_accuracy": 0.0,
+    "start_time": null,
+    "estimated_completion": null,
+    "error_message": "Progressive training failed: Insufficient training data: 0 images available, minimum 100 required"
+  },
+  "system_health": null,
+  "last_updated": "2025-07-25T14:16:13.043481"
+}

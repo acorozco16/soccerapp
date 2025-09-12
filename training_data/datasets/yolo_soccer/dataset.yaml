@@ -1,0 +1,6 @@
+names:
+- soccer_ball
+nc: 1
+path: /Users/andreworozco/soccer app/training_data/datasets/yolo_soccer
+train: images/train
+val: images/val

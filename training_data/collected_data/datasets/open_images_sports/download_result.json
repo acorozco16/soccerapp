@@ -1,0 +1,8 @@
+{
+  "dataset": "open_images_sports",
+  "started_at": "2025-07-25T13:08:52.754651",
+  "images_downloaded": 0,
+  "annotations_created": 0,
+  "completed_at": "2025-07-25T13:08:52.755527",
+  "note": "Placeholder implementation - requires Open Images API integration"
+}

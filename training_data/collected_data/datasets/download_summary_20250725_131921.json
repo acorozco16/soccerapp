@@ -1,0 +1,17 @@
+{
+  "started_at": "2025-07-25T13:19:21.195523",
+  "datasets_requested": [
+    "open_images_sports",
+    "soccer_video_clips"
+  ],
+  "datasets_completed": [
+    "open_images_sports",
+    "soccer_video_clips"
+  ],
+  "datasets_failed": [],
+  "total_images": 0,
+  "total_annotations": 0,
+  "completed_at": "2025-07-25T13:19:21.195556",
+  "duration_seconds": 0.0,
+  "success_rate": 100.0
+}

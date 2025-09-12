@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DrillSelection Preview</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #F8F9FA;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: #F8F9FA;
+            min-height: 100vh;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: #FFFFFF;
+            border-bottom: 1px solid #F8F9FA;
+        }
+        .back-button {
+            color: #004996;
+            margin-right: 15px;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #004996;
+            flex: 1;
+        }
+        .content {
+            padding: 20px;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #6C757D;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .drill-card {
+            background: #FFFFFF;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 2px solid transparent;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .drill-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #004996;
+            flex: 1;
+        }
+        .difficulty-badge {
+            background: #FCBF00;
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+        .difficulty-text {
+            color: #004996;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .drill-description {
+            font-size: 16px;
+            color: #6C757D;
+            margin-bottom: 15px;
+            line-height: 22px;
+        }
+        .criteria-container {
+            background: #f8f6ff;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .criteria-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #004996;
+            margin-bottom: 4px;
+        }
+        .criteria-text {
+            font-size: 16px;
+            color: #004996;
+            font-weight: 500;
+        }
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .time-text {
+            font-size: 14px;
+            color: #6C757D;
+        }
+        .select-text {
+            font-size: 14px;
+            color: #004996;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="back-button">←</div>
+            <div class="title">Choose Your Drill</div>
+        </div>
+
+        <div class="content">
+            <div class="subtitle">
+                Select a drill to practice and analyze your technique
+            </div>
+
+            <div class="drill-card">
+                <div class="card-header">
+                    <div class="drill-name">Juggling</div>
+                    <div class="difficulty-badge">
+                        <div class="difficulty-text">⚽</div>
+                    </div>
+                </div>
+                
+                <div class="drill-description">Keep the ball in the air using any part of your body except hands and arms</div>
+                
+                <div class="criteria-container">
+                    <div class="criteria-label">Success Goal:</div>
+                    <div class="criteria-text">10+ consecutive touches</div>
+                </div>
+                
+                <div class="card-footer">
+                    <div class="time-text">15s</div>
+                    <div class="select-text">Tap to Select</div>
+                </div>
+            </div>
+
+            <div class="drill-card">
+                <div class="card-header">
+                    <div class="drill-name">Bell Touches</div>
+                    <div class="difficulty-badge">
+                        <div class="difficulty-text">⚽</div>
+                    </div>
+                </div>
+                
+                <div class="drill-description">Touch the ball side to side with the inside of both feet in a bell motion</div>
+                
+                <div class="criteria-container">
+                    <div class="criteria-label">Success Goal:</div>
+                    <div class="criteria-text">8+ touches in rhythm</div>
+                </div>
+                
+                <div class="card-footer">
+                    <div class="time-text">10s</div>
+                    <div class="select-text">Tap to Select</div>
+                </div>
+            </div>
+
+            <div class="drill-card">
+                <div class="card-header">
+                    <div class="drill-name">Inside/Outside</div>
+                    <div class="difficulty-badge">
+                        <div class="difficulty-text">⚽</div>
+                    </div>
+                </div>
+                
+                <div class="drill-description">Alternate between inside and outside touches with the same foot</div>
+                
+                <div class="criteria-container">
+                    <div class="criteria-label">Success Goal:</div>
+                    <div class="criteria-text">6+ clean alternating touches</div>
+                </div>
+                
+                <div class="card-footer">
+                    <div class="time-text">8s</div>
+                    <div class="select-text">Tap to Select</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
