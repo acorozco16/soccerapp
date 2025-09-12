@@ -12,12 +12,14 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import authService from '../services/auth';
+import invitationService from '../services/invitations';
 
 export default function RegisterScreen({ navigation }) {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [invitationCode, setInvitationCode] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
@@ -38,12 +40,36 @@ export default function RegisterScreen({ navigation }) {
     }
 
     setLoading(true);
+    
+    // Validate invitation code if provided
+    if (invitationCode.trim()) {
+      const inviteValidation = await invitationService.validateInvitation(invitationCode.trim());
+      if (!inviteValidation.success) {
+        setLoading(false);
+        Alert.alert('Invalid Invitation Code', inviteValidation.error);
+        return;
+      }
+    }
+    
     const result = await authService.register(email, password, fullName);
+    
+    // If registration successful and invitation code provided, accept the invitation
+    if (result.success && invitationCode.trim()) {
+      const acceptResult = await invitationService.acceptInvitation(invitationCode.trim(), result.user.id);
+      if (acceptResult.success) {
+        setLoading(false);
+        Alert.alert('Success', 'Account created and invitation accepted! You are now connected with your friend.', [
+          { text: 'OK', onPress: () => navigation.replace('MainTabs') }
+        ]);
+        return;
+      }
+    }
+    
     setLoading(false);
 
     if (result.success) {
       Alert.alert('Success', 'Account created successfully!', [
-        { text: 'OK', onPress: () => navigation.replace('Home') }
+        { text: 'OK', onPress: () => navigation.replace('MainTabs') }
       ]);
     } else {
       Alert.alert('Registration Failed', result.error);
@@ -95,6 +121,15 @@ export default function RegisterScreen({ navigation }) {
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               secureTextEntry
+              editable={!loading}
+            />
+
+            <TextInput
+              style={styles.input}
+              placeholder="Invitation Code (Optional)"
+              value={invitationCode}
+              onChangeText={setInvitationCode}
+              autoCapitalize="characters"
               editable={!loading}
             />
 

@@ -14,10 +14,10 @@ import drillService from '../services/drills';
 
 // Real Madrid Color Palette
 const Colors = {
-  primary: '#663399',      // Royal Purple
-  gold: '#FFD700',         // Gold
-  navy: '#001F3F',         // Navy Blue
+  gold: '#FCBF00',         // Real Madrid Gold
+  blue: '#004996',         // Real Madrid Blue
   white: '#FFFFFF',        // White
+  red: '#E62644',          // Real Madrid Red
   lightGray: '#F8F9FA',    // Light Gray
   darkGray: '#6C757D',     // Dark Gray
 };
@@ -29,13 +29,43 @@ export default function AnalysisProgressScreen({ route, navigation }) {
   const [currentStep, setCurrentStep] = useState('Uploading video...');
   const [errorMessage, setErrorMessage] = useState('');
   const progressAnim = useState(new Animated.Value(0))[0];
+  const ballBounceAnim = useState(new Animated.Value(0))[0];
+  const ballRotateAnim = useState(new Animated.Value(0))[0];
 
   useEffect(() => {
     startProgressTracking();
+    startBallAnimation();
     return () => {
       // Cleanup any intervals
     };
   }, []);
+
+  const startBallAnimation = () => {
+    // Bouncing animation
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(ballBounceAnim, {
+          toValue: -15,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(ballBounceAnim, {
+          toValue: 0,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+
+    // Rotation animation
+    Animated.loop(
+      Animated.timing(ballRotateAnim, {
+        toValue: 1,
+        duration: 2000,
+        useNativeDriver: true,
+      })
+    ).start();
+  };
 
   const startProgressTracking = async () => {
     let attempts = 0;
@@ -89,22 +119,71 @@ export default function AnalysisProgressScreen({ route, navigation }) {
     checkProgress();
   };
 
+  const getDrillMessages = (drillType) => {
+    const drillMessages = {
+      'juggling': [
+        'Processing video...',
+        'Detecting touches...',
+        'Counting total touches...'
+      ],
+      'v_cuts': [
+        'Processing video...',
+        'Detecting cuts...',
+        'Counting repetitions...'
+      ],
+      'sole_rolls': [
+        'Processing video...',
+        'Detecting rolls...',
+        'Counting repetitions...'
+      ],
+      'inside_outside': [
+        'Processing video...',
+        'Detecting foot touches...',
+        'Counting alternations...'
+      ],
+      'croquetas': [
+        'Processing video...',
+        'Detecting movements...',
+        'Counting repetitions...'
+      ],
+      'bell_touches': [
+        'Processing video...',
+        'Detecting touches...',
+        'Counting total touches...'
+      ],
+      'triangles': [
+        'Processing video...',
+        'Detecting movements...',
+        'Counting triangle completions...'
+      ],
+      'outside_foot_push': [
+        'Processing video...',
+        'Detecting pushes...',
+        'Counting repetitions...'
+      ]
+    };
+    return drillMessages[drillType] || drillMessages['juggling'];
+  };
+
   const updateProgress = (statusData) => {
     let progressPercent = 0;
     let stepText = 'Processing...';
     
+    // Get drill-specific messages
+    const messages = getDrillMessages(drillType);
+    
     switch (statusData.status) {
       case 'uploaded':
         progressPercent = 20;
-        stepText = 'Video uploaded, starting analysis...';
+        stepText = messages[0]; // 'Processing video...'
         break;
       case 'analyzing':
         progressPercent = 50;
-        stepText = 'Analyzing your technique...';
+        stepText = messages[1]; // 'Detecting touches...' etc
         break;
       case 'generating_feedback':
         progressPercent = 80;
-        stepText = 'Generating feedback and scores...';
+        stepText = messages[2]; // 'Counting total touches...' etc
         break;
       case 'completed':
         progressPercent = 100;
@@ -112,7 +191,7 @@ export default function AnalysisProgressScreen({ route, navigation }) {
         break;
       default:
         progressPercent = 10;
-        stepText = 'Processing video...';
+        stepText = messages[0];
     }
     
     setProgress(progressPercent);
@@ -153,7 +232,7 @@ export default function AnalysisProgressScreen({ route, navigation }) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.errorContainer}>
-          <MaterialIcons name="error-outline" size={64} color={Colors.primary} />
+          <MaterialIcons name="error-outline" size={64} color={Colors.red} />
           <Text style={styles.errorTitle}>Analysis Failed</Text>
           <Text style={styles.errorText}>{errorMessage}</Text>
           
@@ -198,10 +277,34 @@ export default function AnalysisProgressScreen({ route, navigation }) {
 
         <View style={styles.progressContainer}>
           <View style={styles.progressRing}>
-            <ActivityIndicator size="large" color={Colors.primary} />
+            <ActivityIndicator size="large" color={Colors.blue} />
           </View>
           
           <Text style={styles.progressPercentage}>{progress}%</Text>
+          
+          {/* Animated Soccer Ball */}
+          <Animated.View 
+            style={[
+              styles.ballContainer,
+              {
+                transform: [
+                  {
+                    translateY: ballBounceAnim
+                  },
+                  {
+                    rotate: ballRotateAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ['0deg', '360deg']
+                    })
+                  }
+                ]
+              }
+            ]}
+          >
+            <MaterialIcons name="sports-soccer" size={40} color={Colors.gold} />
+          </Animated.View>
+          
+          <Text style={styles.analysisText}>Counting touches...</Text>
           
           <View style={styles.progressBarContainer}>
             <View style={styles.progressBarBackground}>
@@ -222,31 +325,6 @@ export default function AnalysisProgressScreen({ route, navigation }) {
           <Text style={styles.stepText}>{currentStep}</Text>
         </View>
 
-        <View style={styles.infoContainer}>
-          <View style={styles.infoCard}>
-            <MaterialIcons name="analytics" size={24} color={Colors.primary} />
-            <Text style={styles.infoTitle}>AI Analysis</Text>
-            <Text style={styles.infoText}>
-              Our system is analyzing your technique, timing, and form
-            </Text>
-          </View>
-          
-          <View style={styles.infoCard}>
-            <MaterialIcons name="timer" size={24} color={Colors.primary} />
-            <Text style={styles.infoTitle}>Processing Time</Text>
-            <Text style={styles.infoText}>
-              Analysis typically takes 1-3 minutes depending on video length
-            </Text>
-          </View>
-          
-          <View style={styles.infoCard}>
-            <MaterialIcons name="star" size={24} color={Colors.primary} />
-            <Text style={styles.infoTitle}>Detailed Feedback</Text>
-            <Text style={styles.infoText}>
-              You'll receive scores, tips, and areas for improvement
-            </Text>
-          </View>
-        </View>
       </View>
     </SafeAreaView>
   );
@@ -272,7 +350,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '600',
-    color: Colors.navy,
+    color: Colors.blue,
   },
   placeholder: {
     width: 34,
@@ -288,7 +366,7 @@ const styles = StyleSheet.create({
   drillName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: Colors.navy,
+    color: Colors.blue,
     textAlign: 'center',
   },
   drillSubtitle: {
@@ -306,7 +384,7 @@ const styles = StyleSheet.create({
   progressPercentage: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: Colors.primary,
+    color: Colors.blue,
     marginBottom: 20,
   },
   progressBarContainer: {
@@ -321,7 +399,7 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.blue,
     borderRadius: 4,
   },
   stepText: {
@@ -329,39 +407,18 @@ const styles = StyleSheet.create({
     color: Colors.darkGray,
     textAlign: 'center',
   },
-  infoContainer: {
-    flex: 1,
-  },
-  infoCard: {
-    backgroundColor: Colors.white,
-    padding: 20,
-    borderRadius: 12,
+  ballContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 15,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    height: 60,
   },
-  infoTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.navy,
-    marginLeft: 15,
-    marginBottom: 5,
-    flex: 1,
-  },
-  infoText: {
+  analysisText: {
     fontSize: 14,
-    color: Colors.darkGray,
-    marginLeft: 15,
-    flex: 1,
-    lineHeight: 20,
+    color: Colors.blue,
+    fontWeight: '500',
+    marginBottom: 20,
+    textAlign: 'center',
   },
   errorContainer: {
     flex: 1,
@@ -372,7 +429,7 @@ const styles = StyleSheet.create({
   errorTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: Colors.navy,
+    color: Colors.blue,
     marginTop: 20,
     marginBottom: 10,
   },
@@ -394,7 +451,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   retryButton: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.blue,
   },
   retryButtonText: {
     color: Colors.white,

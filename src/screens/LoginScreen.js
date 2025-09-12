@@ -30,7 +30,7 @@ export default function LoginScreen({ navigation }) {
 
     if (result.success) {
       // Navigation will be handled by the main navigator
-      navigation.replace('Home');
+      navigation.replace('MainTabs');
     } else {
       Alert.alert('Login Failed', result.error);
     }

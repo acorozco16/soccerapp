@@ -8,11 +8,9 @@ import authService from './src/services/auth';
 // Screens
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
-import ProgressHomeScreen from './src/screens/ProgressHomeScreen';
-import DrillSelectionScreen from './src/screens/DrillSelectionScreen';
-import VideoRecordingScreen from './src/screens/VideoRecordingScreen';
-import AnalysisProgressScreen from './src/screens/AnalysisProgressScreen';
-import AnalysisResultsScreen from './src/screens/AnalysisResultsScreen';
+
+// Navigation
+import MainTabNavigator from './src/navigation/MainTabNavigator';
 
 const Stack = createNativeStackNavigator();
 
@@ -39,18 +37,14 @@ export default function App() {
     <NavigationContainer>
       <StatusBar style="auto" />
       <Stack.Navigator
-        initialRouteName={isAuthenticated ? "Home" : "Login"}
+        initialRouteName={isAuthenticated ? "MainTabs" : "Login"}
         screenOptions={{
           headerShown: false,
         }}
       >
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
-        <Stack.Screen name="Home" component={ProgressHomeScreen} />
-        <Stack.Screen name="DrillSelection" component={DrillSelectionScreen} />
-        <Stack.Screen name="VideoRecording" component={VideoRecordingScreen} />
-        <Stack.Screen name="AnalysisProgress" component={AnalysisProgressScreen} />
-        <Stack.Screen name="AnalysisResults" component={AnalysisResultsScreen} />
+        <Stack.Screen name="MainTabs" component={MainTabNavigator} />
       </Stack.Navigator>
     </NavigationContainer>
   );

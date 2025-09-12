@@ -14,12 +14,13 @@ import drillService from '../services/drills';
 
 // Real Madrid Color Palette
 const Colors = {
-  primary: '#663399',      // Royal Purple
-  gold: '#FFD700',         // Gold
-  navy: '#001F3F',         // Navy Blue
+  gold: '#FCBF00',         // Real Madrid Gold
+  blue: '#004996',         // Real Madrid Blue
   white: '#FFFFFF',        // White
+  red: '#E62644',          // Real Madrid Red
   lightGray: '#F8F9FA',    // Light Gray
   darkGray: '#6C757D',     // Dark Gray
+  textPrimary: '#333',     // Primary text color
 };
 
 export default function DrillSelectionScreen({ navigation }) {
@@ -33,44 +34,57 @@ export default function DrillSelectionScreen({ navigation }) {
 
   const loadDrills = async () => {
     setLoading(true);
+    console.log('🎯 DrillSelection: Loading drills...');
+    
     const result = await drillService.getAvailableDrills();
+    console.log('🎯 DrillSelection: Result:', result);
     
     if (result.success) {
+      console.log('🎯 DrillSelection: Loaded', result.drills.length, 'drills');
       setDrills(result.drills);
     } else {
-      Alert.alert('Error', result.error);
+      console.error('❌ DrillSelection: Failed to load drills:', result.error);
+      Alert.alert(
+        'Connection Error', 
+        `Unable to load drills. Please check your internet connection.\n\nError: ${result.error}`,
+        [
+          { text: 'Retry', onPress: loadDrills },
+          { text: 'Cancel', style: 'cancel' }
+        ]
+      );
     }
     
     setLoading(false);
   };
 
-  const handleDrillSelect = (drill) => {
-    setSelectedDrill(drill.type);
-    // Show drill details before proceeding
-    Alert.alert(
-      drill.name,
-      `${drill.description}\n\nSuccess Criteria: ${drill.success_criteria}`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Start Recording', 
-          onPress: () => navigation.navigate('VideoRecording', { 
-            drillType: drill.type,
-            drillName: drill.name 
-          })
-        }
-      ]
-    );
+  const handleRecord = (drill) => {
+    navigation.navigate('VideoRecording', { 
+      drillType: drill.type,
+      drillName: drill.name 
+    });
+  };
+
+  const handleTimer = (drill) => {
+    navigation.navigate('TimerSelection', { 
+      drillType: drill.type,
+      drillName: drill.name 
+    });
+  };
+
+  const handleLog = (drill) => {
+    navigation.navigate('ManualLog', { 
+      drillType: drill.type,
+      drillName: drill.name 
+    });
   };
 
   const renderDrillCard = (drill) => (
-    <TouchableOpacity
+    <View
       key={drill.type}
       style={[
         styles.drillCard,
         selectedDrill === drill.type && styles.selectedCard
       ]}
-      onPress={() => handleDrillSelect(drill)}
     >
       <View style={styles.cardHeader}>
         <Text style={styles.drillName}>{drill.name}</Text>
@@ -81,25 +95,39 @@ export default function DrillSelectionScreen({ navigation }) {
       
       <Text style={styles.drillDescription}>{drill.description}</Text>
       
-      <View style={styles.criteriaContainer}>
-        <Text style={styles.criteriaLabel}>Success Goal:</Text>
-        <Text style={styles.criteriaText}>{drill.success_criteria}</Text>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity 
+          style={[styles.actionButton, styles.recordButton]}
+          onPress={() => handleRecord(drill)}
+        >
+          <MaterialIcons name="videocam" size={20} color={Colors.white} style={{ marginRight: 6 }} />
+          <Text style={styles.recordButtonText}>Record</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={[styles.actionButton, styles.timerButton]}
+          onPress={() => handleTimer(drill)}
+        >
+          <MaterialIcons name="timer" size={20} color={Colors.blue} style={{ marginRight: 6 }} />
+          <Text style={styles.timerButtonText}>Timer</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={[styles.actionButton, styles.logButton]}
+          onPress={() => handleLog(drill)}
+        >
+          <MaterialIcons name="edit" size={20} color={Colors.gold} style={{ marginRight: 6 }} />
+          <Text style={styles.logButtonText}>Log</Text>
+        </TouchableOpacity>
       </View>
-      
-      <View style={styles.cardFooter}>
-        <Text style={styles.timeText}>
-          {drill.time_window ? `${drill.time_window}s` : 'Flexible duration'}
-        </Text>
-        <Text style={styles.selectText}>Tap to Select</Text>
-      </View>
-    </TouchableOpacity>
+    </View>
   );
 
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.primary} />
+          <ActivityIndicator size="large" color={Colors.blue} />
           <Text style={styles.loadingText}>Loading drills...</Text>
         </View>
       </SafeAreaView>
@@ -109,14 +137,7 @@ export default function DrillSelectionScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <MaterialIcons name="arrow-back" size={24} color={Colors.primary} />
-        </TouchableOpacity>
-        <Text style={styles.title}>Choose Your Drill</Text>
-        <View style={styles.headerRight} />
+        <Text style={styles.title}>Select Practice</Text>
       </View>
 
       <ScrollView 
@@ -156,16 +177,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: Colors.lightGray,
   },
-  backButton: {
-    padding: 5,
-  },
-  headerRight: {
-    width: 34,
-  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: Colors.navy,
+    color: Colors.textPrimary,
   },
   scrollView: {
     flex: 1,
@@ -196,8 +211,8 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   selectedCard: {
-    borderColor: Colors.primary,
-    backgroundColor: '#f8f6ff',
+    borderColor: Colors.blue,
+    backgroundColor: Colors.blue + '10',
   },
   cardHeader: {
     flexDirection: 'row',
@@ -208,7 +223,7 @@ const styles = StyleSheet.create({
   drillName: {
     fontSize: 20,
     fontWeight: '600',
-    color: Colors.navy,
+    color: Colors.textPrimary,
     flex: 1,
   },
   difficultyBadge: {
@@ -218,7 +233,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   difficultyText: {
-    color: Colors.navy,
+    color: Colors.textPrimary,
     fontSize: 12,
     fontWeight: '500',
   },
@@ -228,36 +243,47 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     lineHeight: 22,
   },
-  criteriaContainer: {
-    backgroundColor: '#f8f6ff',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 15,
-  },
-  criteriaLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.primary,
-    marginBottom: 4,
-  },
-  criteriaText: {
-    fontSize: 16,
-    color: Colors.navy,
-    fontWeight: '500',
-  },
-  cardFooter: {
+  buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginTop: 15,
+  },
+  actionButton: {
+    flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginHorizontal: 3,
   },
-  timeText: {
-    fontSize: 14,
-    color: Colors.darkGray,
+  recordButton: {
+    backgroundColor: Colors.red,
   },
-  selectText: {
-    fontSize: 14,
-    color: Colors.primary,
-    fontWeight: '500',
+  recordButtonText: {
+    color: Colors.white,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  timerButton: {
+    backgroundColor: Colors.white,
+    borderWidth: 2,
+    borderColor: Colors.blue,
+  },
+  timerButtonText: {
+    color: Colors.blue,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  logButton: {
+    backgroundColor: Colors.white,
+    borderWidth: 2,
+    borderColor: Colors.gold,
+  },
+  logButtonText: {
+    color: Colors.gold,
+    fontSize: 16,
+    fontWeight: '600',
   },
   loadingContainer: {
     flex: 1,
@@ -279,7 +305,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   retryButton: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.blue,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,

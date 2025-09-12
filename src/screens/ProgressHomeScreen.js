@@ -14,31 +14,33 @@ import drillService from '../services/drills';
 
 // Real Madrid Color Palette
 const Colors = {
-  primary: '#663399',      // Royal Purple
-  gold: '#FFD700',         // Gold
-  navy: '#001F3F',         // Navy Blue
+  gold: '#FCBF00',         // Real Madrid Gold
+  blue: '#004996',         // Real Madrid Blue
   white: '#FFFFFF',        // White
+  red: '#E62644',          // Real Madrid Red
   lightGray: '#F8F9FA',    // Light Gray
   darkGray: '#6C757D',     // Dark Gray
 };
 
 const DRILL_ICONS = {
   juggling: 'sports-soccer',
-  bell_touches: 'touch-app',
-  inside_outside: 'swap-horiz',
-  sole_rolls: 'rotate-right',
-  outside_foot_push: 'trending-up',
-  v_cuts: 'change-history',
-  croquetas: 'rotate-left',
-  triangles: 'details',
+  bell_touches: 'sports-soccer',
+  inside_outside: 'sports-soccer',
+  sole_rolls: 'sports-soccer',
+  outside_foot_push: 'sports-soccer',
+  v_cuts: 'sports-soccer',
+  croquetas: 'sports-soccer',
+  triangles: 'sports-soccer',
 };
 
 export default function ProgressHomeScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [userStats, setUserStats] = useState({
-    sessionsThisWeek: 12,
-    currentStreak: 5,
-    monthlyImprovement: 35,
+    sessionsThisWeek: 0,
+    currentStreak: 0,
+    monthlyImprovement: 0,
+    totalSessions: 0,
+    userName: 'there'
   });
   const [drillProgress, setDrillProgress] = useState([]);
   const [recentAchievement, setRecentAchievement] = useState(null);
@@ -51,36 +53,50 @@ export default function ProgressHomeScreen({ navigation }) {
   const loadProgressData = async () => {
     setLoading(true);
     try {
-      // Load available drills and mock progress data
-      const result = await drillService.getAvailableDrills();
+      console.log('Loading real user progress data...');
       
-      if (result.success && result.drills) {
-        // Mock progress data for now - will be replaced with real data
-        const progressData = result.drills.map((drill, index) => ({
-          ...drill,
-          personalBest: Math.floor(Math.random() * 30) + 10,
-          trend: Math.floor(Math.random() * 20) + 5,
-          lastPracticed: getRandomLastPracticed(index),
-          improvementPercentage: Math.floor(Math.random() * 25) + 5,
-        }));
-        
-        setDrillProgress(progressData);
-        
-        // Set challenge suggestion (drill not practiced recently)
-        const oldestDrill = progressData.find(drill => 
-          drill.lastPracticed.includes('days ago')
-        );
-        if (oldestDrill) {
-          setChallengeSuggestion(oldestDrill);
-        }
-        
-        // Set recent achievement (mock)
-        setRecentAchievement({
-          drillName: 'Juggling',
-          achievement: 'New personal best!',
-          details: 'You hit 27 touches today. Amazing progress!',
-        });
+      // Load user stats and drill progress in parallel
+      const [userStatsResult, drillProgressResult] = await Promise.all([
+        drillService.getUserStats(),
+        drillService.getUserDrillProgress()
+      ]);
+      
+      // Update user stats
+      if (userStatsResult.success) {
+        console.log('User stats loaded:', userStatsResult.stats);
+        setUserStats(userStatsResult.stats);
       }
+      
+      // Update drill progress
+      if (drillProgressResult.success) {
+        console.log('Drill progress loaded:', drillProgressResult.progress.length, 'drills');
+        setDrillProgress(drillProgressResult.progress);
+        
+        // Check for drills that haven't been practiced in a while for challenge suggestions
+        const unpracticedDrills = drillProgressResult.progress.filter(drill => 
+          drill.lastPracticed === 'Never' || drill.totalSessions === 0
+        );
+        
+        if (unpracticedDrills.length > 0) {
+          setChallengeSuggestion(unpracticedDrills[0]);
+        }
+      } else {
+        console.error('Failed to load drill progress:', drillProgressResult.error);
+        // Fallback to basic drill list
+        const basicDrillsResult = await drillService.getAvailableDrills();
+        if (basicDrillsResult.success) {
+          const basicProgress = basicDrillsResult.drills.map(drill => ({
+            ...drill,
+            personalBest: 0,
+            trend: 0,
+            lastPracticed: 'Never',
+            improvementPercentage: 0,
+            totalSessions: 0
+          }));
+          setDrillProgress(basicProgress);
+        }
+      }
+      
     } catch (error) {
       console.error('Failed to load progress data:', error);
     } finally {
@@ -111,23 +127,20 @@ export default function ProgressHomeScreen({ navigation }) {
     }
   };
 
+  const handleDrillSelect = (drill) => {
+    navigation.navigate('DrillProgress', { 
+      drillType: drill.type,
+      drillName: drill.name 
+    });
+  };
+
   const renderStatsHeader = () => (
     <View style={styles.statsHeader}>
       <View style={styles.headerRow}>
-        <Text style={styles.greeting}>Hey Andrew! 🔥</Text>
+        <Text style={styles.greeting}>Hey {userStats.userName}!</Text>
         <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-          <MaterialIcons name="logout" size={20} color={Colors.navy} />
+          <MaterialIcons name="logout" size={20} color={Colors.darkGray} />
         </TouchableOpacity>
-      </View>
-      <View style={styles.statsRow}>
-        <Text style={styles.sessionsText}>{userStats.sessionsThisWeek} sessions this week</Text>
-        <Text style={styles.streakText}>{userStats.currentStreak} days in a row!</Text>
-      </View>
-      <View style={styles.improvementCard}>
-        <MaterialIcons name="trending-up" size={24} color={Colors.white} />
-        <Text style={styles.improvementText}>
-          You've improved {userStats.monthlyImprovement}% this month!
-        </Text>
       </View>
     </View>
   );
@@ -156,12 +169,16 @@ export default function ProgressHomeScreen({ navigation }) {
   };
 
   const renderDrillCard = (drill) => (
-    <View key={drill.type} style={styles.drillCard}>
+    <TouchableOpacity 
+      key={drill.type} 
+      style={styles.drillCard}
+      onPress={() => handleDrillSelect(drill)}
+    >
       <View style={styles.drillHeader}>
         <MaterialIcons 
           name={DRILL_ICONS[drill.type] || 'sports-soccer'} 
           size={24} 
-          color={Colors.primary} 
+          color={Colors.blue} 
         />
         <Text style={styles.drillName}>{drill.name}</Text>
       </View>
@@ -184,7 +201,7 @@ export default function ProgressHomeScreen({ navigation }) {
         <View style={[styles.trendPoint, { left: '70%' }]} />
         <View style={[styles.trendPoint, { left: '90%', backgroundColor: Colors.gold }]} />
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   const renderAchievement = () => {
@@ -205,7 +222,7 @@ export default function ProgressHomeScreen({ navigation }) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.primary} />
+          <ActivityIndicator size="large" color={Colors.blue} />
           <Text style={styles.loadingText}>Loading your progress...</Text>
         </View>
       </SafeAreaView>
@@ -220,7 +237,6 @@ export default function ProgressHomeScreen({ navigation }) {
         showsVerticalScrollIndicator={false}
       >
         {renderStatsHeader()}
-        {renderChallenge()}
         
         <View style={styles.drillsSection}>
           <Text style={styles.sectionTitle}>Your Drills</Text>
@@ -228,8 +244,6 @@ export default function ProgressHomeScreen({ navigation }) {
             {drillProgress.map(renderDrillCard)}
           </View>
         </View>
-        
-        {renderAchievement()}
       </ScrollView>
       
       <View style={styles.bottomCTA}>
@@ -247,7 +261,7 @@ export default function ProgressHomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.lightGray,
+    backgroundColor: Colors.white,
   },
   scrollView: {
     flex: 1,
@@ -263,7 +277,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 10,
     fontSize: 16,
-    color: Colors.navy,
+    color: Colors.darkGray,
   },
   
   // Stats Header
@@ -281,7 +295,7 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: Colors.navy,
+    color: '#333',
   },
   logoutButton: {
     padding: 5,
@@ -294,7 +308,7 @@ const styles = StyleSheet.create({
   },
   sessionsText: {
     fontSize: 16,
-    color: Colors.navy,
+    color: '#333',
     fontWeight: '500',
   },
   streakText: {
@@ -303,7 +317,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   improvementCard: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.blue,
     padding: 15,
     borderRadius: 12,
     flexDirection: 'row',
@@ -324,7 +338,7 @@ const styles = StyleSheet.create({
   challengeTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: Colors.navy,
+    color: '#333',
     marginBottom: 10,
   },
   challengeCard: {
@@ -339,11 +353,11 @@ const styles = StyleSheet.create({
   },
   challengeText: {
     fontSize: 16,
-    color: Colors.navy,
+    color: '#333',
     lineHeight: 22,
   },
   challengeButton: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.blue,
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
@@ -363,7 +377,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: Colors.navy,
+    color: '#333',
     marginBottom: 15,
   },
   drillsGrid: {
@@ -394,7 +408,7 @@ const styles = StyleSheet.create({
   drillName: {
     fontSize: 14,
     fontWeight: '600',
-    color: Colors.navy,
+    color: '#333',
     marginLeft: 8,
     flex: 1,
   },
@@ -407,7 +421,7 @@ const styles = StyleSheet.create({
   personalBest: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: Colors.navy,
+    color: '#333',
   },
   trendContainer: {
     flexDirection: 'row',
@@ -435,7 +449,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.blue,
     top: -2,
   },
   
@@ -458,7 +472,7 @@ const styles = StyleSheet.create({
   achievementTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: Colors.navy,
+    color: '#333',
     marginBottom: 4,
   },
   achievementDetails: {
@@ -481,7 +495,7 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.lightGray,
   },
   startPracticeButton: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.blue,
     paddingVertical: 15,
     borderRadius: 12,
     alignItems: 'center',

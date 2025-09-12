@@ -1,12 +1,13 @@
 {
   "expo": {
-    "name": "Soccer Training App",
+    "name": "BallWork",
     "slug": "soccer-training-app",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "scheme": "ballwork",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -14,10 +15,13 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.soccertraining.app",
-      "buildNumber": "29",
+      "bundleIdentifier": "com.ballwork.app",
+      "buildNumber": "41",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "This app uses the camera to record soccer training videos for skill analysis and improvement.",
+        "NSMicrophoneUsageDescription": "This app may access the microphone to record audio with training videos.",
+        "NSPhotoLibraryUsageDescription": "This app allows you to select videos from your photo library for soccer skill analysis."
       }
     },
     "android": {
@@ -25,7 +29,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.soccertraining.app",
+      "package": "com.ballwork.app",
       "edgeToEdgeEnabled": true
     },
     "web": {
@@ -34,7 +38,10 @@
     "extra": {
       "eas": {
         "projectId": "c79af07c-1988-475a-b311-4a01acaa262f"
-      }
+      },
+      "SUPABASE_URL": "https://nxumfeldylzpqwqlvszz.supabase.co",
+      "SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im54dW1mZWxkeWx6cHF3cWx2c3p6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5MTY1NDksImV4cCI6MjA2OTQ5MjU0OX0.D2WvA9Ld2YalWbum6qi5CBvXxmj75v1BuDb-NKrJkxo",
+      "DRILL_BASE_URL": "https://soccertrainingapp.org"
     },
     "owner": "acorozco16"
   }

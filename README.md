@@ -1,4 +1,12 @@
-# Soccer Training App
+# ⚽ Soccer Training Mobile App
+
+> **Production Ready**: React Native + Expo mobile app for youth soccer practice tracking
+
+## 🌐 **Current Status**
+- **Production**: Live on TestFlight for iOS testing
+- **Backend**: Connected to soccertrainingapp.org (DigitalOcean)
+- **Features**: 8 drill types with AI analysis + manual logging
+- **Distribution**: EAS Build system ready for App Store
 
 ## 🚀 Quick Start
 
@@ -49,13 +57,15 @@ Then press 'j' to open debugger
 
 ## ⚠️ Important Notes
 
-1. **Backend Connection**: Currently points to `localhost:8000`. You'll need to:
-   - Start your backend server: `cd ../backend && python3 main.py`
-   - For phone testing, change `localhost` to your computer's IP address in `src/constants/config.js`
+1. **Backend Connection**: 
+   - **Production**: Uses `https://soccertrainingapp.org` (current default)
+   - **Development**: Change to `http://localhost:8000` in `src/constants/config.js`
+   - **Local Testing**: Use your computer's IP address (e.g., `http://192.168.1.100:8000`)
 
-2. **Test Credentials**: Since the backend requires real authentication, you'll need to:
-   - Register a new account through the app, or
-   - Use existing credentials if you have them
+2. **Authentication**: 
+   - **Production**: Full Supabase authentication system
+   - **Development**: Same auth system, works with local backend
+   - Create new accounts directly through the mobile app
 
 ## 🎯 Next Steps
 

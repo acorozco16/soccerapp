@@ -7,6 +7,12 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
+      "env": {
+        "SUPABASE_URL": "https://nxumfeldylzpqwqlvszz.supabase.co",
+        "SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im54dW1mZWxkeWx6cHF3cWx2c3p6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5MTY1NDksImV4cCI6MjA2OTQ5MjU0OX0.D2WvA9Ld2YalWbum6qi5CBvXxmj75v1BuDb-NKrJkxo",
+        "DRILL_BASE_URL": "https://soccertrainingapp.org",
+        "ENVIRONMENT": "development"
+      },
       "ios": {
         "buildConfiguration": "Debug"
       },
@@ -17,6 +23,12 @@
     },
     "preview": {
       "distribution": "internal",
+      "env": {
+        "SUPABASE_URL": "https://nxumfeldylzpqwqlvszz.supabase.co",
+        "SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im54dW1mZWxkeWx6cHF3cWx2c3p6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5MTY1NDksImV4cCI6MjA2OTQ5MjU0OX0.D2WvA9Ld2YalWbum6qi5CBvXxmj75v1BuDb-NKrJkxo",
+        "DRILL_BASE_URL": "https://soccertrainingapp.org",
+        "ENVIRONMENT": "preview"
+      },
       "ios": {
         "buildConfiguration": "Release"
       },
@@ -25,6 +37,12 @@
       }
     },
     "production": {
+      "env": {
+        "SUPABASE_URL": "https://nxumfeldylzpqwqlvszz.supabase.co",
+        "SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im54dW1mZWxkeWx6cHF3cWx2c3p6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5MTY1NDksImV4cCI6MjA2OTQ5MjU0OX0.D2WvA9Ld2YalWbum6qi5CBvXxmj75v1BuDb-NKrJkxo",
+        "DRILL_BASE_URL": "https://soccertrainingapp.org",
+        "ENVIRONMENT": "production"
+      },
       "ios": {
         "buildConfiguration": "Release"
       },
@@ -34,6 +52,7 @@
     }
   },
   "submit": {
-    "production": {}
+    "production": {},
+    "preview": {}
   }
 }
